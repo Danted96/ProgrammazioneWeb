@@ -1,0 +1,45 @@
+
+              <% if(errore != null) {%>
+                <%-'<h3 style="color:#ffaaaa;">'+ errore + '</h3>' %>
+                    <% } %>
+        <form style="padding-top:50px" method="POST" action="/registrazione" name="registrazione">
+                <div class="form-group">
+                    <label class="col-form-label" for="formGroupNome" required>Nome</label>
+                    <input type="text" class="form-control" id="nome" name="nome" placeholder="Example input">
+                </div>
+                <div class="form-group">
+                    <label class="col-form-label" for="formGroupCognome" required>Cognome</label>
+                    <input type="text" class="form-control" id="cognome" name="cognome" placeholder="Another input">
+                </div>
+                <div class="form-group">
+                    <label class="col-form-label" for="formGroupEmail" required>Email</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+                </div>
+                <div class="form-group">
+                        <label class="col-form-label" for="formGroupIndirizzo" required>Indirizzo</label>
+                        <input type="text" class="form-control" id="indirizzo" name="indirizzo" placeholder="Example input">
+                </div>
+                <div class="form-group">
+                            <label for="inputState">Stato</label>
+                            <select id="stato" class="form-control" name="stato">
+                              <option selected>Italia</option>
+                              <option>Spagna</option>
+                              <option>Francia</option>
+                              <option>Germania</option>
+                              <option>Olanda</option>
+                            </select>
+                </div>
+                <div class="form-group">
+                        <label class="col-form-label" for="formGroupProvincia" required>Provincia</label>
+                        <input type="text" class="form-control" id="provincia" name="provincia" placeholder="Example input">
+                </div>
+                <div class="form-group">
+                        <label class="col-form-label" for="formGroupTelefono" required>Telefono</label>
+                        <input type="tel" class="form-control" id="telefono" name="telefono" placeholder="Example input">
+                </div>
+                <div class="form-group">
+                        <label class="col-form-label" for="formGroupPassword" required>Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Example input">
+                </div>
+                <button class="btn btn-primary" type="submit">Invia</button>
+              </form>
