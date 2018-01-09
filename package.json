@@ -1,0 +1,31 @@
+{
+  "name": "Progetto-e-commerce",
+  "version": "0.0.0",
+  "private": true,
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "body-parser": "~1.17.1",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.3",
+    "ejs": "^2.5.7",
+    "express": "~4.15.2",
+    "express-fileupload": "^0.2.0",
+    "express-session": "^1.15.5",
+    "mongodb": "^2.2.31",
+    "morgan": "~1.8.1",
+    "nodemon": "^1.14.3",
+    "serve-favicon": "~2.4.2",
+    "socket.io": "^2.0.3"
+  },
+  "description": "Progetto-e-commerce - Programmazione Web 2016/2017",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Danted96/ProgrammazioneWeb.git"
+  },
+ 
+  "homepage": "https://github.com/Danted96/ProgrammazioneWeb#readme",
+  "devDependencies": {}
+}
