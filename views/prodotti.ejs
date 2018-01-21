@@ -39,4 +39,20 @@
 
         </div>
         <% } %>
-          
+        <script>
+            function avvisaUser(codice) {
+              $.ajax({
+                type: 'POST',
+                url: window.location.origin + '/avvertimi',
+                timeout: 5000,//timeout,
+                data: { codice: codice },
+                success: function () {
+                  alert('Grazie!\n Sarai avvisato tramite mail non appena il prodotto tornerà disponibile.');
+                },
+                error: function (jqXHR, textStatus, err) {
+                  console.log(jqXHR);
+                }
+              });
+    
+            }
+          </script>
