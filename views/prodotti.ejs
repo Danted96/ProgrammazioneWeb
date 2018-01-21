@@ -1,0 +1,42 @@
+<% var i=0; %>
+    <% while(i< prodotti.length) { %>
+        <div class="row">
+            <% for(var j =0; (j<4) && (i< prodotti.length); j++) { %>
+                <div class="col-sm-3 col-xs-6">
+                    <div class="thumbnail">
+                        <img src="/images/prodotti/pc.jpg" alt="" onclick="window.location = window.location.origin + '/prodotto?pro=<%- prodotti[i]._id %>';">
+                        <div class="caption">
+                            <h3>
+                                <%= prodotti[i].nome %>
+                            </h3>
+                            <h3 style="text-align: center">
+                                <%= prodotti[i].prezzo %> € </h3>
+                            <br>
+                            <% if(prodotti[i].quantità > 0){ %>
+                                <span class="disponibilità"> Disponibile </span>
+                                <p>
+                                    <button href="#" class="btn btn-primary " role="button" onclick="window.location = window.location.origin + '/carrello?add=<%- prodotti[i]._id %>';">Acquista</button>
+                                    <button href="#" class="btn btn-default" role="button" onclick="window.location = window.location.origin + '/prodotto?pro=<%- prodotti[i]._id %>';">Dettagli</button>
+                                </p>
+
+                                <% } else if(auth == true) { %>
+                                    <span id="item-not-available" class="item-availability"> Non disponibile</span>
+                                    <p>
+                                        <button id="Alert-button" class="btn btn-info" onclick="avvisaUser('<%- prodotti[i]._id %>')"> Avvisami </button>
+                                        <button href="#" class="btn btn-default" role="button" onclick="window.location = window.location.origin + '/prodotto?pro=<%- prodotti[i]._id %>';">Dettagli</button>
+                                    </p>
+                                    <% }else{%>
+                                        <span id="item-not-available" class="item-availability"> Non disponibile</span>
+                                        <p>
+                                            <button href="#" class="btn btn-default" role="button" onclick="window.location = window.location.origin + '/prodotto?pro=<%- prodotti[i]._id %>';">Dettagli</button>
+                                        </p>
+                                        <%} %>
+                        </div>
+                    </div>
+                </div>
+                <% i++; %>
+                    <% } %>
+
+        </div>
+        <% } %>
+          
