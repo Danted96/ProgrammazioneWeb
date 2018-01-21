@@ -8,10 +8,11 @@
   <title>
     <%= title %>
   </title>
-
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="../js/bootstrap.min.js"></script>
   <link rel="stylesheet" type="text/css" href="../css/bootstrap.css">
   <link rel="stylesheet" type="text/css" href="../css/style.css">
- 
+  <link rel="stylesheet" type="image" href="../images">
 </head>
 
 <body>
@@ -31,77 +32,90 @@
 
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        <ul class="nav navbar-nav">
-          <li class="active">
-            <a href="#">Contattaci
-              <span class="sr-only">(current)</span>
-            </a>
-          </li>
-        </ul>
 
         <% if(auth == false) {%>
-        <ul class="nav navbar-nav navbar-right">
-          <li>
-            <a href="#" onclick="window.location= window.location.origin + '/registrazione';">registrati</a>
-          </li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Accedi
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu" >
-              
-              <form method="POST" action="/login">
-              <div class="form-group">
-                <label>Email</label>
-                <input type="text" class="form-control" id="accesso-email" name="login_email" placeholder="email">
-              </div>
-
-              <div class="form-group">
-                <label>Password</label>
-                <input type="password" class="form-control" id="accesso-password" name="login_password" placeholder="password">
-              </div>
-
-              <button type="submit" class="btn btn-primary" >Accedi</button>
-            </form>
-              <li role="separator" class="divider">
-
-              </li>
-              <li>
-                <a href="#">Non ricordo la mia password</a>
-              </li>
-            </ul>
-          </li>
-        </ul>
-        <% } else { %>
           <ul class="nav navbar-nav navbar-right">
             <li>
-              <a href="#" onclick="window.location= window.location.origin + '/profilo';">Profilo</a>
+              <a href="#" onclick="window.location = window.location.origin + '/carrello';">Carrello</a>
             </li>
             <li>
-              <a href="#" onclick="window.location= window.location.origin + '/logout';">Logout</a>
+              <a href="#" onclick="window.location= window.location.origin + '/registrazione';">Registrati</a>
             </li>
-            <li>
-               <!-- Carrello da fare-->
-              <a href="#" onclick="window.location= window.location.origin + '/';">Carrello</a>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Accedi
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" style="padding: 15px;">
+
+                <form method="POST" id="form-login" action="/login">
+                  <div class="form-group">
+                    <label>Email</label>
+                    <input type="text" class="form-control" id="accesso-email" name="login_email" placeholder="email">
+                  </div>
+
+                  <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" id="accesso-password" name="login_password" placeholder="password">
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="check-amministratore" onClick="funzioneAmministratore()" style="width:16px; height:16px">
+                    <label class="form-check-label" for="defaultCheck1">
+                      Amministratore
+                    </label>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary">Accedi</button>
+                </form>
+
+                <script>
+
+                  function funzioneAmministratore() {
+                    if (document.getElementById("check-amministratore").checked == true) {
+                      document.getElementById("form-login").action = "/amministrazione/login"
+                    } else {
+                      document.getElementById("form-login").action = "/login"
+                    }
+                  }
+                </script>
+                <li role="separator" class="divider">
+
+                </li>
+                <li>
+                  <a href="#" onclick="window.location= window.location.origin + '/passwordDimenticata';">Non ricordo la mia password</a>
+                </li>
+              </ul>
             </li>
+          </ul>
+          <% } else { %>
+            <ul class="nav navbar-nav navbar-right">
+              <li>
+                <a href="#" onclick="window.location= window.location.origin + '/profilo';">Profilo</a>
+              </li>
+              <li>
+                <a href="#" onclick="window.location= window.location.origin + '/logout';">Logout</a>
+              </li>
+              <li>
+                <!-- Carrello da fare-->
+                <a href="#" onclick="window.location = window.location.origin + '/carrello';">Carrello</a>
+              </li>
 
 
 
-          <% } %>
+              <% } %>
 
-        <form class="navbar-form navbar-right">
-          <div class="form-group">
-            <input type="text" class="form-control" placeholder="Search">
-          </div>
-          <button type="submit" class="btn btn-default">Cerca</button>
-        </form>
-
+                <form class="navbar-form navbar-right" action="/cerca" method="GET">
+                  <div class="form-group">
+                    <input type="text" class="form-control" name="search" placeholder="Search">
+                  </div>
+                  <button type="submit" class="btn btn-default">Cerca</button>
+                </form>
+            </ul>
       </div>
       <!-- /.navbar-collapse -->
     </div>
     <!-- /.container-fluid -->
   </nav>
-    <% if(contenuto == 'prodotti')  {%>
+  <% if(contenuto == 'prodotti')  {%>
     <nav id="navbar-categorie" class="navbar navbar-default">
       <div class="container">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2"
@@ -114,32 +128,53 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
           <ul class="nav navbar-nav">
             <li id="categoria">
-              <a href="#">Laptops </a>
+              <a href="#" onclick="window.location = window.location.origin + '/categoria?cat=laptops';">Laptops </a>
             </li>
             <li id="categoria">
-              <a href="#">Desktops </a>
+              <a href="#" onclick="window.location = window.location.origin + '/categoria?cat=desktops';">Desktops </a>
             </li>
             <li id="categoria">
-              <a href="#">Monitors </a>
+              <a href="#" onclick="window.location = window.location.origin + '/categoria?cat=monitors';">Monitors </a>
             </li>
             <li id="categoria">
-              <a href="#">Tablets </a>
+              <a href="#" onclick="window.location = window.location.origin + '/categoria?cat=tablets';">Tablets </a>
             </li>
             <li id="categoria">
-              <a href="#">Accessori </a>
+              <a href="#" onclick="window.location = window.location.origin + '/categoria?cat=accessori';">Accessori </a>
             </li>
           </ul>
         </div>
-    
-    </nav>
-    <% } %>
 
-  <!-- inizio contenuti -->
-  <div id="contenuto" class="container">
-    <%- include(contenuto) %>
-  </div>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script src="../js/bootstrap.min.js"></script>
+    </nav>
+    <% }else if(contenuto == 'profilo') { %>
+      <nav id="navbar-categorie" class="navbar navbar-default">
+        <div class="container">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2"
+            aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+            <ul class="nav navbar-nav">
+              <li id="profilo">
+                <a href="#" onclick="window.location = window.location.origin + '/profilo';">Profilo </a>
+              </li>
+              <li id="profilo">
+                <a href="#" onclick="window.location = window.location.origin + '/profilo/storicoordini';">Ordini </a>
+              </li>
+            </ul>
+          </div>
+
+      </nav>
+      <% } %>
+
+        <!-- inizio contenuti -->
+        <div id="contenuto" class="container">
+          <%- include(contenuto) %>
+        </div>
+
 </body>
 
 </html>
