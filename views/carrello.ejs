@@ -1,0 +1,141 @@
+<script type="text/javascript" src="../js/carrello.js">
+</script>
+<h1>Carrello</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Immagine</th>
+            <th scope="col">Prodotto</th>
+            <th scope="col">Prezzo</th>
+            <th scope="col">Quantità</th>
+            <th scope="col"></th>
+            <th scope="col">Totale</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% for(var i = 0; i<carrello.length; i++){ %>
+
+
+            <tr>
+                <td scope="row" class="col-sm-1">
+                    <img src="https://source.unsplash.com/280x280/?technology">
+                </td>
+                <td name="nome" class="col-sm-3">
+                    <div class="product-title">
+                        <h2>
+                            <%- JSON.parse(carrello[i]).nome %>
+                        </h2>
+                    </div>
+                    <p class="product-description">
+                        <%- JSON.parse(carrello[i]).descrizione %>
+                    </p>
+                </td>
+                <td name="prezzo" id="prezzo<%- i %>" class="col-sm-1">
+                    <h4>
+                        <%- JSON.parse(carrello[i]).prezzo %> €
+                    </h4>
+                </td>
+                <td class="col-sm-1">
+                    <input class="item-amount" name="quantità" type="text" id="quantità<%- i %>" value="<%- JSON.parse(carrello[i]).quantità %>">
+                </td>
+                <td class="col-sm-2">
+                    <button class="btn btn-warning" name="Aggiorna" type="submit" onclick="carrelloUpdate(<%- i %>,$('#quantità<%- i %>').val());">Aggiorna</button>
+                    <button class="btn btn-danger" name="rimuovi" type="submit" onclick="carrelloRemove(<%- i %>);">Rimuovi</button>
+                </td>
+                <td class="col-sm-1" id="subTotale<%- i %>" style="font-size:18px;">
+
+                </td>
+            </tr>
+
+            <% } %>
+                <% if(carrello.length > 0){ %>
+                    <%
+                       
+                    var totale = Number(0);
+                    for(var i = 0; i<carrello.length; i++){
+                    totale = Number(totale) + ((Number(JSON.parse(carrello[i]).prezzo))*Number(JSON.parse(carrello[i]).quantità));
+                    }
+                   
+                    %>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <button id="compra" class="btn btn-primary" name="Compra" type="submit" onclick=" window.location = window.location.origin + '/carrello/acquista';">Acquista</button>
+
+                            </td>
+
+                            <td>
+                                <strong>Totale:</strong><h4>
+                                    <%- totale %> €
+                                </h4>
+                                
+                                    <% } else {%>
+                                        Ritorna dopo aver aggiunto qualche prodotto.
+
+                                        <% }%>
+                            </td>
+                        </tr>
+    </tbody>
+</table>
+
+<script>
+    window.onload = function () {
+        for (var j = 0; j < <%- carrello.length %>; j++) {
+            console.log('indice : ' + j);
+            var prezzo = parseFloat($('#prezzo' + j).text());
+            console.log('prezzo : ' + prezzo);
+            var quantità = parseFloat($('#quantità' + j).val());
+            console.log('quantità : ' + quantità);
+
+            var subtotale = prezzo * quantità;
+            console.log('subtotale : ' + subtotale);
+            $('#subTotale' + j).text(subtotale + '€');
+
+        }
+    };
+    function carrelloRemove(index) {
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + '/carrello/remove',
+            timeout: 5000,//timeout,
+            data: {
+                index: index
+            },
+            success: function () {
+                window.location = window.location.origin + '/carrello';
+            },
+            error: function (jqXHR, textStatus, err) {
+                console.log(jqXHR);
+            }
+        });
+    }
+    function carrelloUpdate(index, quantity) {
+        $.ajax({
+            type: "POST",
+            url: window.location.origin + '/carrello/update',
+            timeout: 5000,//timeout,
+            data: {
+                index: index,
+                quantity: quantity
+            },
+            success: function () {
+                window.location = window.location.origin + '/carrello';
+
+            },
+            error: function (jqXHR, textStatus, err) {
+                console.log(jqXHR);
+            }
+        });
+    }
+
+    $('#compra').click(function () {
+        alert('Grazie per aver acquistato sul nostro sito!');
+    });
+
+
+
+</script>
