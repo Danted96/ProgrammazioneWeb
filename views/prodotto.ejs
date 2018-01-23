@@ -1,0 +1,60 @@
+<div class="row" id="row-prodotto">
+  <div class="col-md-4">
+    <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+      <!-- Indicators -->
+      <ol class="carousel-indicators">
+        <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+        <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+        <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+      </ol>
+
+      <!-- Wrapper for slides -->
+      <div class="carousel-inner" role="listbox">
+        <div class="item active" style="background-image: url(https://source.unsplash.com/360x360/?technology);">
+
+          <div class="carousel-caption">
+
+          </div>
+        </div>
+        <div class="item" style="background-image: url(https://source.unsplash.com/360x360/?buildings);">
+
+          <div class="carousel-caption">
+
+          </div>
+        </div>
+        <div class="item" style="background-image: url(https://source.unsplash.com/360x360/?food);">
+
+          <div class="carousel-caption">
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="nome">
+      <h2>
+        <%- dati_prodotto.nome %>
+      </h2>
+    </div>
+    <div class="descrizione">
+      <h4>
+        <%- dati_prodotto.descrizione %>
+      </h4>
+    </div>
+  </div>
+  <div class="col-md-4">
+
+    <span style="font-size:18px;">
+      Prezzo:
+      <%- dati_prodotto.prezzo %> €              
+    </span>
+    <span>
+      <button href="#" class="btn btn-primary " role="button" onclick="window.location = window.location.origin + '/carrello?add=<%- dati_prodotto._id %>';">Acquista</button>
+    </span>
+
+
+  </div>
+</div>
