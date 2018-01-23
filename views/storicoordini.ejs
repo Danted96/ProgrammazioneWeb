@@ -1,0 +1,45 @@
+<div class="conteiner-orders">
+    <h1>
+        I MIEI ORDINI
+    </h1>
+    <table style="width:100%;">
+        <thead>
+            <tr>
+                <th scope="col">Data</th>
+                <th scope="col">Prodotto</th>
+                <th scope="col">Quantità</th>
+                <th scope="col">Prezzo</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% for(var i = 0; i<ordini.length; i++){ %>
+                <tr>
+                    <td scope="row" style="font-size:18px; width:40%;">
+                        <%- (ordini[i]).data
+                        %>
+                    </td>
+                    <td name="nome"  style="font-size:18px; width:30%;">
+
+                        <h2>
+                            <%- (ordini[i]).nome %>
+                        </h2>
+
+
+                    </td>
+                    <td name="quantità"  style="font-size:18px; width:15%;">
+                        <h3>
+                            <%- (ordini[i]).quantità %>
+                        </h3>
+                    </td>
+                    <td name="prezzo"  style="font-size:18px; width:15%;">
+                        <h3>
+                            <%- (ordini[i]).prezzo %>
+                        </h3>
+                    </td>
+
+                </tr>
+
+                <% } %>
+        </tbody>
+    </table>
+</div>
