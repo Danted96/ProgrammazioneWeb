@@ -485,3 +485,50 @@ router.get('/carrello/acquista', function (req, res, next) {
 
 
 /* CARRELLO */
+router.get('/passwordDimenticata', function (req, res, next) {
+    funzione(req, function (dati) {
+        res.render('index', { title: 'home', contenuto: 'passwordDimenticata', auth: dati.logged })
+
+    });
+
+});
+router.post('/nuovaPassword', function (req, res, next) {
+    console.log('corpo : ' + req.body.password1);
+    var email = req.body.emailnuovapassword;
+    var password = req.body.password1;
+    var confermapassword = req.body.password2;
+    if (email == '' || password == '' || confermapassword == '') {
+        funzione(req, function (dati) {
+            res.redirect('/');
+        });
+    } else if (password == confermapassword) {
+        monGlo.update('Utenti', { email: email }, { password: password }, function (result) {
+            var transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'Noreplay.ProgettoPW@gmail.com',
+                    pass: 'Noreplayprogrammazioneweb'
+                }
+            });
+
+            var mailOptions = {
+                from: 'Noreplay.ProgettoPW@gmail.com',
+                to: email,
+                subject: 'Nuova password',
+                text: 'La tua nuova password è ' + password
+            };
+
+            transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
+            });
+            res.redirect('/');
+        });
+
+    } else {
+        res.redirect('/passwordDimenticata');
+    }
+});
