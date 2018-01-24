@@ -220,3 +220,268 @@ router.get('/cerca', function (req, res, next) {
 
     });
 });
+
+/* CATEGORIA */
+router.get('/categoria', function (req, res, next) {
+
+    var categoria_prodotto = req.query.cat;
+    console.log('categoria del prodotto' + req.query.cat);
+    funzione(req, function (dati) {
+        monGlo.find('Prodotti', { categoria: categoria_prodotto }, {}, function (dati_prodotto) {
+            console.log(dati_prodotto[0]);
+            res.render('index', {
+                title: 'prodotto',
+                contenuto: 'prodotti',
+                prodotti: dati_prodotto,
+                auth: dati.logged
+            });
+        });
+    });
+});
+router.post('/avvertimi', function (req, res, next) {
+    var codice_prodotto = req.body.codice;
+    funzione(req, function (dati) {
+        if (dati.logged == false) {
+            res.redirect('/');
+        } else {
+            monGlo.find('Prodotti', { _id: ObjectID(codice_prodotto) }, { nome: 1 }, function (search_result) {
+                var prodotto = search_result[0];
+                var avvertendi = (prodotto.avverti_user == '') ? [] : JSON.parse(prodotto.avverti_user);
+                monGlo.find('Utenti', { _id: ObjectID(dati.userID) }, {}, function (utente) {
+                    avvertendi.push(utente[0].email);
+                    monGlo.update('Prodotti', { _id: ObjectID(codice_prodotto) }, { avverti_user: JSON.stringify(avvertendi) }, function (result) {
+                        res.send('OK');
+                    });
+                });
+            });
+        }
+    });
+});
+
+/* CARRELLO */
+router.get('/carrello', function (req, res, next) {
+    var aggiungi = req.query.add;
+
+    console.log('aggiungi : ' + aggiungi);
+    funzione(req, function (dati) {
+        if (dati.logged == true) {
+            monGlo.find('Utenti', { _id: ObjectID(dati.userID) }, {}, function (utente) {
+                var codice_utente = utente[0]._id;
+                console.log('codice utente : ' + codice_utente);
+                var carrello = (req.session.carrello != undefined) ? req.session.carrello : [];
+                console.log('carrello : ' + carrello);
+                if (carrello.length == 0) {
+                    monGlo.find('Carrelli', { codice_utente: codice_utente }, {}, function (carrello_utente) {
+                        console.log('carrello utente : ' + JSON.stringify(carrello_utente[0]));
+                        carrello = JSON.parse(carrello_utente[0].carrello);
+                        req.session.carrello = carrello;
+                        if (aggiungi == undefined) {
+                            res.render('index', { title: 'carrello', contenuto: 'carrello', auth: dati.logged, carrello: carrello });
+                        } else {
+
+                            var aggiungilo = true;
+                            if (carrello != []) {
+                                for (var i = 0; i < carrello.length; i++) {
+                                    if (JSON.parse(carrello[i]).codice == aggiungi)
+                                        aggiungilo = false;
+                                }
+                            }
+
+                            if (aggiungilo == true)
+                                monGlo.find('Prodotti', { _id: ObjectID(aggiungi) }, {}, function (oggetto) {
+                                    oggetto[0].quantità = 1;
+                                    carrello.push(JSON.stringify(oggetto[0]));
+                                    req.session.carrello = carrello;
+                                    monGlo.update('Carrelli', { codice_utente: codice_utente }, { carrello: JSON.stringify(carrello) }, function (result) {
+                                        res.render('index', { title: 'carrello', contenuto: 'carrello', auth: dati.logged, carrello: carrello });
+                                    });
+                                });
+                            else
+                                res.render('index', { title: 'carrello', contenuto: 'carrello', auth: dati.logged, carrello: carrello });
+                        }
+                    });
+                } else {
+                    var aggiungilo = true;
+                    if (carrello != []) {
+                        for (var i = 0; i < carrello.length; i++) {
+                            if (JSON.parse(carrello[i]).codice == aggiungi)
+                                aggiungilo = false;
+                        }
+                    }
+                    if (aggiungi == undefined) {
+                        monGlo.update('Carrelli', { codice_utente: codice_utente }, { carrello: JSON.stringify(carrello) }, function (result) {
+                            res.render('index', { title: 'carrello', contenuto: 'carrello', auth: dati.logged, carrello: carrello });
+                        });
+                    } else {
+                        if (aggiungilo == true)
+                            monGlo.find('Prodotti', { _id: ObjectID(aggiungi) }, {}, function (oggetto) {
+                                oggetto[0].quantità = 1;
+                                carrello.push(JSON.stringify(oggetto[0]));
+                                req.session.carrello = carrello;
+                                monGlo.update('Carrelli', { codice_utente: codice_utente }, { carrello: JSON.stringify(carrello) }, function (result) {
+                                    res.render('index', { title: 'carrello', contenuto: 'carrello', auth: dati.logged, carrello: carrello });
+                                });
+                            });
+                        else
+                            res.render('index', { title: 'carrello', contenuto: 'carrello', auth: dati.logged, carrello: carrello });
+                    }
+                }
+            });
+        } else {
+            var carrello = (req.session.carrello != null) ? req.session.carrello : [];
+            var aggiungilo = true;
+            if (req.session.carrello != []) {
+                for (var i = 0; i < carrello.length; i++) {
+                    if (JSON.parse(carrello[i]).codice == aggiungi)
+                        aggiungilo = false;
+                }
+            }
+            if (aggiungi == undefined) {
+                res.render('index', { title: 'carrello', contenuto: 'carrello', auth: dati.logged, carrello: carrello });
+            } else {
+                if (aggiungilo == true)
+                    monGlo.find('Prodotti', { _id: ObjectID(aggiungi) }, {}, function (oggetto) {
+                        oggetto[0].quantità = 1;
+                        carrello.push(JSON.stringify(oggetto[0]));
+                        req.session.carrello = carrello;
+                        res.render('index', { title: 'carrello', contenuto: 'carrello', auth: dati.logged, carrello: carrello });
+                    });
+                else
+                    res.render('index', { title: 'carrello', contenuto: 'carrello', auth: dati.logged, carrello: carrello });
+            }
+        }
+    });
+});
+router.post('/carrello/remove', function (req, res, next) {
+    var carrello = (req.session.carrello != undefined) ? req.session.carrello : [];
+    carrello.splice(req.body.index, 1);
+    req.session.carrello = carrello;
+    console.log('indice : ' + req.body.index);
+    funzione(req, function (dati) {
+        if (dati.logged == true) {
+            monGlo.find('Utenti', { _id: ObjectID(dati.userID) }, {}, function (utente) {
+                var codice_utente = utente[0]._id;
+                monGlo.update('Carrelli', { codice_utente: codice_utente }, { carrello: JSON.stringify(carrello) }, function (result) {
+                    res.send('ok');
+                });
+            });
+        } else {
+            res.send('ok');
+        }
+    });
+});
+router.post('/carrello/update', function (req, res, next) {
+    var carrello = (req.session.carrello != null) ? req.session.carrello : [];
+    console.log('carrello : ' + carrello);
+    for (var i = 0; i < carrello.length; i++) {
+        if (i == req.body.index) {
+            console.log('index : ' + i);
+            var edit = JSON.parse(carrello[i]);
+            console.log('carrello : ' + edit);
+            edit.quantità = req.body.quantity;
+            carrello[i] = JSON.stringify(edit);
+        }
+    }
+    res.redirect('/carrello');
+});
+
+
+router.get('/carrello/acquista', function (req, res, next) {
+    var carrello = (req.session.carrello != null) ? req.session.carrello : [];
+    console.log('carrello : ' + carrello);
+    funzione(req, function (dati) {
+        if (dati.logged == false) {
+            res.redirect('/');
+        } else {
+
+
+            for (var i = 0; i < carrello.length; i++) {
+                var singoloProdotto = JSON.parse(carrello[i]);
+                console.log('carrello quantità : ' + singoloProdotto.quantità);
+                console.log('prodotto id : ' + singoloProdotto._id);
+                var quantity;
+
+                monGlo.find('Prodotti', { _id: ObjectID(singoloProdotto._id) }, {}, function (prodotto) {
+                    if (singoloProdotto.quantità > prodotto[0].quantità) {
+                        function alert() {
+                            alert('quantità richiesta superiore a quella disponibile!');
+                        }
+                        res.redirect('/carrello');
+                    }
+                    console.log('vecchia quantità : ' + prodotto[0].quantità);
+                    quantity = prodotto[0].quantità - singoloProdotto.quantità;
+                    monGlo.update('Prodotti', { _id: ObjectID(singoloProdotto._id) }, { quantità: (quantity) }, function (QT) {
+
+
+
+                        if (Number(quantity) <= 5) {
+                            var transporter = nodemailer.createTransport({
+                                service: 'gmail',
+                                auth: {
+                                    user: 'Noreplay.ProgettoPW@gmail.com',
+                                    pass: 'Noreplayprogrammazioneweb'
+                                }
+                            });
+
+                            var mailOptions = {
+                                from: 'Noreplay.ProgettoPW@gmail.com',
+                                to: 'william.taruschio@studenti.unicam.it , dante.domizi@studenti.unicam.it',
+                                subject: 'Prodotto in esaurimento',
+                                text: 'Prodotto "' + singoloProdotto.nome + '" (cod. ' + singoloProdotto._id + ') in esaurimento' + 'rimangono solo ' + quantity + ' disponibili.'
+                            }
+
+                            transporter.sendMail(mailOptions, function (error, info) {
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    console.log('Email sent: ' + info.response);
+                                }
+                            });
+                        }
+
+
+                        var data = new Date();
+                        var ordine;
+                        monGlo.find('Ordini', { codice_utente: ObjectID(dati.userID) }, {}, function (ORDINE) {
+                            ordine = JSON.parse(ORDINE[0].ordine);
+                            console.log('ordine : '+ ordine);
+                            ordine.push({
+
+                                data: data.toUTCString(),
+                                nome: singoloProdotto.nome,
+                                quantità: singoloProdotto.quantità,
+                                prezzo: singoloProdotto.prezzo,
+
+                            });
+                            monGlo.update('Ordini', { codice_utente: ObjectID(dati.userID) }, { ordine: (ordine) }, function (ORDINE) {
+
+                            });
+
+                        })
+
+
+                    });
+                });
+
+
+            }
+            carrello = carrello.splice(carrello.length, 0);
+            req.session.carrello = carrello;
+            console.log('carrello dopo : ' + carrello);
+            monGlo.find('Utenti', { _id: ObjectID(dati.userID) }, { nome: 1 }, function (utente) {
+                var codice_utente = utente[0]._id;
+                monGlo.update('Carrelli', { codice_utente: codice_utente }, { carrello: JSON.stringify(carrello) }, function (result) {
+                    res.redirect('/carrello');
+                });
+
+
+            });
+
+
+        }
+    });
+
+});
+
+
+/* CARRELLO */
