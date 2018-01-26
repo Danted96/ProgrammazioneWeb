@@ -532,3 +532,322 @@ router.post('/nuovaPassword', function (req, res, next) {
         res.redirect('/passwordDimenticata');
     }
 });
+
+/* PARTE AMMINISTRAZIONE */
+router.get('/amministrazione', function (req, res, next) {
+    funzione2(req, function (dati) {
+
+
+        if (req.session.buser !== undefined) {
+            var query = { _id: ObjectID(req.session.buser), stato: true };
+            monGlo.find('Backend_sessione', query, {}, function (data) {
+                if (data.length == 0) {
+                    req.session.destroy();
+                    res.redirect('/');
+                } else {
+                    res.render('backend/index', { title: 'amministrazione', contenuto: 'gestioneprodotti', prodotti: dati.prodotti, auth: dati.logged });
+                }
+            });
+        } else {
+            res.redirect('/');
+        }
+    });
+});
+router.post('/amministrazione/login', function (req, res, next) {
+    funzione2(req, function (dati) {
+        var query = { email: req.body.login_email, password: req.body.login_password, amministratore: true };
+        console.log('query : '+query);
+        console.log(req.body);
+        var uid;
+        monGlo.find('Utenti', query, {}, function (data) {
+            console.log(data);
+            if (data.length == 0) {
+                res.redirect('/');
+            } else {
+                uid = data[0]._id;
+                query = { codice: uid };
+                monGlo.find('Backend_sessione', query, {}, function (data) {
+                    if (data.length == 0) {
+                        query = { codice: uid, stato: true };
+                        monGlo.insert('Backend_sessione', query, function (data) {
+                            req.session.buser = data[0]._id;
+                            res.redirect('/amministrazione');
+                        });
+                    } else {
+                        query = { codice: uid };
+                        monGlo.update('Backend_sessione', query, { stato: false }, function (data) {
+                            query = { codice: uid, stato: true };
+                            monGlo.insert('Backend_sessione', query, function (data) {
+                                req.session.buser = data[0]._id;
+                                res.redirect('/amministrazione');
+                            });
+                        });
+                    }
+                });
+            }
+        });
+    });
+});
+router.get('/logout', function (req, res) {
+    var uid = req.session.buser;
+    req.session.destroy();
+    var query = { _id: ObjectID(uid) };
+    monGlo.update('Backend_sessione', query, { stato: false }, function (data) {
+        monGlo.remove('Backend_sessione', { stato: false }, function (data) {
+            res.redirect('/amministrazione/login');
+        });
+    });
+});
+
+router.get('/amministrazione/cerca', function (req, res, next) {
+    funzione(req, function (dati) {
+        if (req.query.search) {
+            const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+            console.log('regex' + regex);
+            monGlo.find('Prodotti', { nome: regex }, {}, function (dati_ricerca) {
+                console.log('prodotti ricercati: ' + dati_ricerca[0]);
+                res.render('backend/index', { title: 'amministrazione', contenuto: 'gestioneprodotti', prodotti: dati_ricerca, auth: dati.logged });
+
+
+            });
+        }
+
+    });
+});
+
+router.get('/amministrazione/prodotto', function (req, res, next) {
+
+    var codice_prodotto = req.query.pro;
+    console.log('codice del prodotto' + req.query.pro);
+    var _id = (codice_prodotto);
+    console.log('id  ' + _id);
+    funzione(req, function (dati) {
+        monGlo.find('Prodotti', { _id: ObjectID(codice_prodotto) }, {}, function (dati_prodotto) {
+            res.render('backend/index', {
+                title: 'prodotto',
+                contenuto: 'aggiungiprodotto',
+                dati_prodotto: dati_prodotto[0],
+                auth: dati.logged,
+                errore: null
+            });
+        });
+    });
+});
+
+router.post('/amministrazione/aggiungi', function (req, res, next) {
+    funzione2(req, function (dati) {
+        var prodotto = { nome: req.body.nome, quantità: req.body.quantità, prezzo: req.body.prezzo, categoria: req.body.categoria, descrizione: req.body.descrizione };
+        if (prodotto.nome == '' || prodotto.quantità == '' || prodotto.prezzo == '' || prodotto.categoria == '' || prodotto.descrizione == '') {
+            res.render('backend/aggiungiprodotto', { errore: 'dati non corretti o incompleti', auth: dati.logged });
+        }
+        if (req.session.buser !== undefined) {
+            var query = { _id: ObjectID(req.session.buser), stato: true };
+            monGlo.find('Backend_sessione', query, {}, function (data) {
+                if (data.length == 0) {
+                    res.redirect('/amministrazione/login');
+                } else {
+                    if (Number(prodotto.quantità) <= 5) {
+                        var transporter = nodemailer.createTransport({
+                            service: 'gmail',
+                            auth: {
+                                user: 'Noreplay.ProgettoPW@gmail.com',
+                                pass: 'Noreplayprogrammazioneweb'
+                            }
+                        });
+
+                        var mailOptions = {
+                            from: 'Noreplay.ProgettoPW@gmail.com',
+                            to: 'dante.domizi@studenti.unicam.it , william.taruschio@studenti.unicam.it',
+                            subject: 'immessa quantità scarsa',
+                            text: 'Prodotto "' + prodotto.nome + '" (cod. ' + prodotto._id + ')  , immesso solo ' + prodotto.quantità + ' pezzi.'
+                        };
+
+                        transporter.sendMail(mailOptions, function (error, info) {
+                            if (error) {
+                                console.log(error);
+                            } else {
+                                console.log('Email sent: ' + info.response);
+                            }
+                        });
+                    }
+                    monGlo.insert('Prodotti', {
+                        nome: prodotto.nome,
+                        descrizione: prodotto.descrizione,
+                        quantità: Number(prodotto.quantità),
+                        prezzo: parseFloat(prodotto.prezzo),
+                        categoria: prodotto.categoria,
+                        avverti_user: ""
+                    }, function (data) {
+                        res.redirect('/amministrazione');
+                    });
+
+                }
+            });
+        } else
+            res.redirect('/amministrazione/login');
+    });
+});
+
+router.post('/amministrazione/update', function (req, res, next) {
+    var salva_prodotto = { id: req.body.id, nome: req.body.nome, quantità: req.body.quantità, prezzo: req.body.prezzo, categoria: req.body.categoria, descrizione: req.body.descrizione };
+
+    console.log('id prodotto : ' + salva_prodotto.id);
+    console.log('salva prodotto : ' + salva_prodotto);
+    if (req.session.buser !== undefined) {
+        var query = { _id: ObjectID(req.session.buser), stato: true };
+        monGlo.find('Backend_sessione', query, {}, function (data) {
+            if (data.length == 0) {
+                res.redirect('/amministrazione/login');
+            } else {
+                if (Number(salva_prodotto.quantità) <= 5) {
+                    var transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                            user: 'Noreplay.ProgettoPW@gmail.com',
+                            pass: 'Noreplayprogrammazioneweb'
+                        }
+                    });
+
+                    var mailOptions = {
+                        from: 'Noreplay.ProgettoPW@gmail.com',
+                        to: 'dante.domizi@studenti.unicam.it',
+                        subject: 'Prodotto "' + salva_prodotto.nome + '" (cod. ' + salva_prodotto.id + ') in esaurimento',
+                        text: 'rimangono solo ' + salva_prodotto.quantità + ' disponibili'
+                    };
+
+                    transporter.sendMail(mailOptions, function (error, info) {
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            console.log('Email sent: ' + info.response);
+                        }
+                    });
+                }
+                monGlo.update('Prodotti', { _id: ObjectID(salva_prodotto.id) }, {
+                    nome: salva_prodotto.nome,
+                    descrizione: salva_prodotto.descrizione,
+                    quantità: Number(salva_prodotto.quantità),
+                    prezzo: parseFloat(salva_prodotto.prezzo),
+                    categoria: salva_prodotto.categoria
+                }, function () {
+                    if (Number(salva_prodotto.quantità) > 0) {
+                        monGlo.find('Prodotti', { _id: ObjectID(salva_prodotto.id) }, { nome: 1 }, function (prodotto_da_segnalare) {
+                            var avvertendi = (prodotto_da_segnalare[0].avverti_user == '') ? [] : JSON.parse(prodotto_da_segnalare[0].avverti_user);
+                            for (var i = 0; i < avvertendi.length; i++) {
+                                var transporter = nodemailer.createTransport({
+                                    service: 'gmail',
+                                    auth: {
+                                        user: 'Noreplay.ProgettoPW@gmail.com',
+                                        pass: 'Noreplayprogrammazioneweb'
+                                    }
+                                });
+
+                                var mailOptions = {
+                                    from: 'Noreplay.ProgettoPW@gmail.com',
+                                    to: 'dante.domizi@studenti.unicam.it',
+                                    subject: 'Prodotto "' + salva_prodotto.nome + '" (cod. ' + salva_prodotto.id + ') in esaurimento',
+                                    text: 'rimangono solo ' + salva_prodotto.quantità + ' disponibili'
+                                };
+
+                                transporter.sendMail(mailOptions, function (error, info) {
+                                    if (error) {
+                                        console.log(error);
+                                    } else {
+                                        console.log('Email sent: ' + info.response);
+                                    }
+                                });
+                            }
+                            monGlo.update('Prodotti', { _id: ObjectID(salva_prodotto.id) }, { avverti_user: '' }, function () { });
+                            res.redirect('/amministrazione');
+                        });
+                    } else {
+                        res.redirect('/amministrazione');
+                    }
+                });
+            }
+        });
+    } else
+        res.redirect('/amministrazione/login');
+});
+
+router.post('/amministrazione/delete', function (req, res, next) {
+    var id_prodotto = ObjectID(req.query.id);
+    console.log('id da eliminare : ' + id_prodotto);
+    if (req.session.buser !== undefined) {
+        var query = { _id: ObjectID(req.session.buser), stato: true };
+        monGlo.find('Backend_sessione', query, {}, function (data) {
+            if (data.length == 0) {
+                res.redirect('/amministrazione/login');
+            } else {
+                monGlo.remove('Prodotti', { _id: id_prodotto }, function (data) {
+                    res.redirect('/amministrazione');
+                });
+            }
+        });
+    } else
+        res.redirect('/amministrazione/login');
+
+});
+
+router.post('/upload', function (req, res, next) {
+    if (req.session.buser !== undefined) {
+        var query = { _id: ObjectID(req.session.buser), stato: true };
+        monGlo.find('Backend_sessione', query, {}, function (data) {
+            if (data.length == 0) {
+                res.redirect('/amministrazione/login');
+            } else {
+                console.log(req.files.file1);
+                var file_1 = req.files.file1;
+
+                file_1.mv('./public/images/prodotti/' + file_1.name, function (err) {
+                    if (err) {
+                        console.log(err);
+                        return res.send(err);
+                        //return res.status(500).send(err);
+                    }
+
+                });
+                res.redirect('/amministrazione/prodotto');
+            }
+        });
+    } else
+        res.redirect('/amministrazione/login');
+});
+
+
+function funzione2(req, callback) {
+    var out = { prodotti: '', logged: false, userID: '' };
+    monGlo.find('Prodotti', {}, { codice: 1 }, function (dati_collezione) {
+        out.prodotti = dati_collezione;
+        if (req.session.buser !== undefined) {
+            var query = { _id: ObjectID(req.session.buser), stato: true };
+            monGlo.find('Backend_sessione', query, {}, function (data) {
+                console.log('prova amministrazione :  ' + data[0]);
+                if (data.length != 0) {
+                    out.userID = data[0].codice;
+                    out.logged = true;
+                }
+                callback(out);
+            });
+        } else
+            callback(out);
+    });
+};
+function funzione(req, callback) {
+    var out = { prodotti: '', logged: false, userID: '' };
+    monGlo.find('Prodotti', {}, { codice: 1 }, function (dati_collezione) {
+        out.prodotti = dati_collezione;
+        if (req.session.buser !== undefined) {
+            var query = { _id: ObjectID(req.session.buser), stato: true };
+            monGlo.find('Sessione', query, {}, function (data) {
+                if (data.length != 0) {
+                    out.userID = data[0].codice;
+                    out.logged = true;
+                }
+                callback(out);
+            });
+        } else
+            callback(out);
+    });
+};
+module.exports = router;
