@@ -16,6 +16,7 @@
     "express-session": "^1.15.5",
     "mongodb": "^2.2.31",
     "morgan": "~1.8.1",
+    "nodemailer": "^4.4.1",
     "nodemon": "^1.14.3",
     "serve-favicon": "~2.4.2",
     "socket.io": "^2.0.3"

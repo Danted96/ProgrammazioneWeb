@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var fileUpload = require('express-fileupload');
-//var mongoose=require('mongoose');
+
 var app = express();
 
 // set the port of our application
@@ -14,12 +14,14 @@ var app = express();
 var port = process.env.PORT || 8080;
 
 
-var frontend = require('./routes/frontend');
-//var backend = require('./routes/backend');
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+var routing = require('./routes/routing');
+
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -62,9 +64,17 @@ app.use(session({
 
 
 
-/* PARTE FRONTEND */
-app.use('/', frontend);
-app.use('/registrazione', frontend);
+/* routing */
+app.use('/', routing);
+app.use('/registrazione', routing);
+app.use('/prodotto', routing);
+app.use('/profilo', routing);
+app.use('/carrello', routing);
+app.use('/amministrazione', routing);
+app.use('/amministrazione/login', routing);
+app.use('/amministrazione/prodotti', routing);
+app.use('/amministrazione/prodotto', routing);
+
 
 
 // catch 404 and forward to error handler
