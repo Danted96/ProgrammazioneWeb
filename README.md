@@ -2,7 +2,7 @@
 Unicam
 Progetto Programmazione Web 2016/2017
 
-Link Heroku : 
+Link Heroku :
 ## User story:
 * Come admin voglio poter accedere ad un’area privata tramite username e password
 * Come admin voglio gestire le rimanenze e i re-ordini dei prodotti
@@ -17,5 +17,47 @@ Link Heroku :
 
 ## Architettura dei file e delle cartelle:
 ```
++ ProgrammazioneWeb
+	+ .vscode
+		launch.json
+	+ node_modules
+	+ public
+  		+ css
+		    bootstrap.css
+			  bootstrap.min.css
+			  style.css
+  	+ images
+			+ prodotti
+				pc.jpg	
+		+ js
+			bootstrap.js
+			bootstrap.min.js
+			carrello.js
+	+ routes
+  		routing.js
+	+ views
+		+ backend
+			aggiungiprodotto.ejs
+			gestioneprodotti.ejs
+			index.ejs
+		carrello.ejs
+		datiutente.ejs
+		error.ejs
+		index.ejs
+		passwordDimenticata.ejs
+		prodotti.ejs
+		prodotto.ejs
+		profilo.ejs
+		registrazione.ejs
+		storicoordini.ejs
+    + zzCustom
+		mongoGlobal.js
+		package.json
+		socketGlobal.js
+ app.js
+ package.json
+ package-lock.json
+ Procfile
+ README.md
 
 ```
