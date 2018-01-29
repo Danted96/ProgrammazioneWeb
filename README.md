@@ -74,6 +74,6 @@ npm start
 ```
 
 ## Autori 
-William Taruschio william.taruschio@studenti.unicam.it 095101
-Dante Domizi dante.domizi@studenti.unicam.it 095800
-Luca Rossi luca02.rossi@studenti.unicam.it 095572
+* William Taruschio william.taruschio@studenti.unicam.it 095101
+* Dante Domizi dante.domizi@studenti.unicam.it 095800
+* Luca Rossi luca02.rossi@studenti.unicam.it 095572
