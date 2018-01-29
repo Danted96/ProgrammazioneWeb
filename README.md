@@ -2,7 +2,16 @@
 Unicam
 Progetto Programmazione Web 2016/2017
 
-Link Heroku :
+Link Heroku : https://stark-journey-36236.herokuapp.com/
+
+Per avviare il progetto in locale: 
+1) Selezionare la cartella del progetto
+2) Scrivere da prompt dei comandi il seguente comando: 
+
+```
+npm start
+```
+
 ## User story:
 * Come admin voglio poter accedere ad un’area privata tramite username e password
 * Come admin voglio gestire le rimanenze e i re-ordini dei prodotti
@@ -14,6 +23,8 @@ Link Heroku :
 * Come user posso ricercare un prodotto all'interno del sito
 * Come user voglio poter reimpostare la mia password se dimenticata 
 * Come user voglio gestire il mio ordine dal carello, modificando la quantità e rimuovendo i prodotti
+* Come user posso modificare i dati del mio account
+* Come user posso visualizzare i prodotti in base alle categorie 
 
 ## Architettura dei file e delle cartelle:
 ```
@@ -61,3 +72,8 @@ Link Heroku :
  README.md
 
 ```
+
+## Autori 
+William Taruschio william.taruschio@studenti.unicam.it 095101
+Dante Domizi dante.domizi@studenti.unicam.it 095800
+Luca Rossi luca02.rossi@studenti.unicam.it 095572
