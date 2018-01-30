@@ -47,7 +47,6 @@ password: admin
 		+ js
 			bootstrap.js
 			bootstrap.min.js
-			carrello.js
 	+ routes
   		routing.js
 	+ views
