@@ -12,6 +12,10 @@ Per avviare il progetto in locale:
 npm start
 ```
 
+### Credenziali amministratore 
+email: dante.domizi@studenti.unicam.it 
+password: admin
+
 ## User story:
 * Come admin voglio poter accedere ad un’area privata tramite username e password
 * Come admin voglio gestire le rimanenze e i re-ordini dei prodotti
