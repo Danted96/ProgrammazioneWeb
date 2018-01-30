@@ -1,0 +1,49 @@
+<% if(errore != null) {%>
+    <%-'<h3 style="color:#ffaaaa;">'+ errore + '</h3>' %>
+        <% } %>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <form style="padding-top:30px" method="POST" action="/amministrazione/aggiungi" name="aggiungi">
+                        <div class="form-group">
+                            <label class="col-form-label" for="nome" required>Nome:</label>
+                            <input class="aggiungi-prodotto" name="nome" type="text" id="nome">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-form-label" for="quantità" required>Quantità:</label>
+                            <input class="aggiungi-prodotto" name="quantità" id="quantità">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label" for="prezzo" required>Prezzo:</label>
+                            <input class="aggiungi-prodotto" name="prezzo" type="text" id="prezzo">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputCategoria">Categoria</label>
+                            <select id="categoria" class="form-control" name="categoria">
+                                <option selected>desktops</option>
+                                <option>laptops</option>
+                                <option>monitors</option>
+                                <option>tablets</option>
+                                <option>accessori</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label" for="descrizione" required>Descrizione:</label>
+                            <textarea class="form-control" id="descrizioneTextarea" name="descrizione" rows="3"></textarea>
+                        </div>
+
+                        <button class="btn btn-primary" type="submit">Aggiungi</button>
+                    </form>
+                </div>
+                <div class="col-sm-6">
+                    <form style="padding-top:30px" method="POST" action="/amministrazione/upload" name="aggiungiFile" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label class="col-form-label" for="immagine" required>Immagine:</label>
+                            <input type="file" id="file1" name="file1">
+                            <br>
+                        </div>
+                        <button class="btn btn-primary" type="submit">Upload</button>
+                    </form>
+                </div>
+            </div>
