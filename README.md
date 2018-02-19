@@ -13,7 +13,7 @@ npm start
 ```
 
 ### Credenziali amministratore 
-email: dante.domizi@studenti.unicam.it 
+email: william.taruschio@studenti.unicam.it
 password: admin
 
 ## User story:
