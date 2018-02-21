@@ -72,7 +72,7 @@ router.get('/logout', function(req, res, next) {
 /* HOME */
 
 
-/* REGISTRAZIONE da sistemare, creare collections carrelli e sessione */
+/* REGISTRAZIONE*/
 router.get('/registrazione', function(req, res) {
     funzione(req, function(dati) {
         if (dati.logged == true)
