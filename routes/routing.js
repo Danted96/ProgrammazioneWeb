@@ -5,7 +5,7 @@ var monGlo = require('../zzCustom/mongoGlobal');
 var ObjectID = require("mongodb").ObjectID;
 var nodemailer = require('nodemailer');
 var fileUpload = require('express-fileupload');
-
+var arrayVuoto = [];
 
 
 
@@ -97,7 +97,7 @@ router.post('/registrazione', function(req, res, next) {
                     var query = { codice: Number(result[0].codice) };
                     monGlo.insert('Carrelli', { codice_utente: result[0]._id, carrello: '[]' }, function(cartRes) {
                         var uid;
-                        monGlo.insert('Ordini', { codice_utente: result[0]._id, ordine: '[]' }, function(ordine) {
+                        monGlo.insert('Ordini', { codice_utente: result[0]._id, ordine: arrayVuoto }, function(ordine) {
                             monGlo.find('Utenti', query, {}, function(data) {
                                 if (data.length == 0) {
                                     res.render('index', { title: 'registrazione', contenuto: 'registrazione', errore: 'dati non corretti', auth: dati.logged });
