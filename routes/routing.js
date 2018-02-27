@@ -424,7 +424,7 @@ router.get('/carrello/acquista', function(req, res, next) {
 
                             var mailOptions = {
                                 from: 'Noreplay.ProgettoPW@gmail.com',
-                                to: ['william.taruschio@studenti.unicam.it', 'dante.domizi@studenti.unicam.it'],
+                                to: ['william.taruschio@studenti.unicam.it'],
                                 subject: 'Prodotto in esaurimento',
                                 text: 'Prodotto "' + singoloProdotto.nome + '" (cod. ' + singoloProdotto._id + ') in esaurimento' + 'rimangono solo ' + quantity + ' disponibili.'
                             }
