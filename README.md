@@ -3,6 +3,7 @@ Unicam
 Progetto Programmazione Web 2016/2017
 
 Link Heroku : https://stark-journey-36236.herokuapp.com/
+Link al video su youtube: https://www.youtube.com/watch?v=MG7enLoEDOE&feature=youtu.be
 
 Per avviare il progetto in locale: 
 1) Selezionare la cartella del progetto
