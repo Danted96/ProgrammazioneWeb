@@ -36,7 +36,7 @@
                     </h4>
                 </td>
                 <td class="col-sm-1">
-                    <input class="item-amount" name="quantità" type="text" id="quantità<%- i %>" value="<%- JSON.parse(carrello[i]).quantità %>">
+                    <input class="item-amount" name="quantità" type="text" id="quantità<%- i %>" value="<%- JSON.parse(carrello[i]).quantita %>">
                 </td>
                 <td class="col-sm-2">
                     <button class="btn btn-warning" name="Aggiorna" type="submit" onclick="carrelloUpdate(<%- i %>,$('#quantità<%- i %>').val());">Aggiorna</button>
@@ -53,7 +53,7 @@
                        
                     var totale = Number(0);
                     for(var i = 0; i<carrello.length; i++){
-                    totale = Number(totale) + ((Number(JSON.parse(carrello[i]).prezzo))*Number(JSON.parse(carrello[i]).quantità));
+                    totale = Number(totale) + ((Number(JSON.parse(carrello[i]).prezzo))*Number(JSON.parse(carrello[i]).quantita));
                     }
                    
                     %>
@@ -87,10 +87,10 @@
             console.log('indice : ' + j);
             var prezzo = parseFloat($('#prezzo' + j).text());
             console.log('prezzo : ' + prezzo);
-            var quantità = parseFloat($('#quantità' + j).val());
-            console.log('quantità : ' + quantità);
+            var quantita = parseFloat($('#quantità' + j).val());
+            console.log('quantità : ' + quantita);
 
-            var subtotale = prezzo * quantità;
+            var subtotale = prezzo * quantita;
             console.log('subtotale : ' + subtotale);
             $('#subTotale' + j).text(subtotale + '€');
 

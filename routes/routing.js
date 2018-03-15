@@ -829,7 +829,7 @@ function loggingAmministratore(req, callback) {
 
 function logging(req, callback) {
     var out = { prodotti: '', logged: false, userID: '' };
-    Prodotti.find({}).then(function (err, dati_collezione) {
+    Prodotti.find({},function (err, dati_collezione) {
         if (err) {
             res.send(err)
         }
