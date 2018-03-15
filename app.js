@@ -6,8 +6,18 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var fileUpload = require('express-fileupload');
+var mongoose = require('mongoose');
 
+mongoose.connect('mongodb://williamTaruschio:taruschio2@ds159112.mlab.com:59112/pw_e-commerce')
+var db = mongoose.connection;
 var app = express();
+
+db.once('open', function () {
+    console.log('connesso a mongodb');
+})
+db.on('error', function (err) {
+    console.log(err);
+})
 
 // set the port of our application
 // process.env.PORT lets the port be set by Heroku
@@ -30,18 +40,17 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use(fileUpload());
 
 
 
 /* SOCKET.IO */
 // SOCKET IO SRV GLOBAL INIT
-var ioMan = require('./zzCustom/socketGlobal');
+
 var server = require('http').Server(app);
-ioMan.server(app.listen(port, function() {
+app.listen(port, function () {
     console.log('Our app is running on http://localhost:' + port);
-}));
+});
 
 /* socketio */
 app.use(session({
@@ -78,14 +87,14 @@ app.use('/amministrazione/prodotto', routing);
 
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};

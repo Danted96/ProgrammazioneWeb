@@ -12,7 +12,7 @@
                             <h3 style="text-align: center">
                                 <%= prodotti[i].prezzo %> € </h3>
                             <br>
-                            <% if(prodotti[i].quantità > 0){ %>
+                            <% if(prodotti[i].quantita > 0){ %>
                                 <span class="disponibilità"> Disponibile </span>
                                 <p>
                                     <button href="#" class="btn btn-primary " role="button" onclick="window.location = window.location.origin + '/carrello?add=<%- prodotti[i]._id %>';">Acquista</button>
