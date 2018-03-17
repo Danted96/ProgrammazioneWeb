@@ -1,18 +1,22 @@
 var express = require('express');
+let app = express();
 var router = express.Router();
 var mongoose = require('mongoose');
+var cookieParser = require('cookie-parser');
+app.use(cookieParser());
 var monGlo = require('../zzCustom/mongoGlobal');
 var ObjectID = require("mongodb").ObjectID;
 var nodemailer = require('nodemailer');
 var fileUpload = require('express-fileupload');
 var arrayVuoto = [];
-
+var jwt = require('jsonwebtoken');
 var Prodotti = require('../models/prodotti');
 var Sessione = require('../models/sessioni');
 var Utenti = require('../models/utenti');
 var Sessione_backend = require('../models/sessioni_backend');
 var Ordini = require('../models/ordini');
 var Carrelli = require('../models/carrelli');
+var config = require('../config');
 
 //...
 
@@ -20,7 +24,7 @@ var Carrelli = require('../models/carrelli');
 
 router.get('/', function(req, res, next) {
     logging(req, function(dati) {
-        console.log(dati);
+        // console.log(dati);
 
         Prodotti.find(function(search_result) {
             res.render('index', { title: 'home', contenuto: 'prodotti', prodotti: dati.prodotti, auth: dati.logged });
@@ -28,51 +32,62 @@ router.get('/', function(req, res, next) {
     });
 });
 router.post('/login', function(req, res, next) {
-    logging(req, function(dati) {
-        var query = { email: req.body.login_email, password: req.body.login_password };
-        console.log(query);
-        console.log(req.body);
-        var uid;
-        Utenti.find(query).then(function(data) {
-            console.log('utente :' + data);
-            if (data.length == 0) {
-                res.redirect('/');
-            } else {
-                uid = data[0]._id;
-                query = { codice: uid };
-                Sessione.find(query).then(function(data) {
-                    console.log('dati sessione  ' + data);
-                    console.log('stato sessione  ' + data[0].stato);
-                    if (data[0].stato == false) {
-                        Sessione.update({ codice: uid }, { stato: true }, function(raw) {
-                            console.log('raw message from mongo:  ' + raw);
-                            req.session.buser = data[0]._id;
-                            console.log('buser  ' + req.session.buser);
-                            res.redirect('/');
-                        });
+    // logging(req, function(dati) {
+    var query = { email: req.body.login_email, password: req.body.login_password };
+    console.log(query);
+    console.log(req.body);
+    var uid;
+    Utenti.find(query).then(function(data) {
+        console.log('utente :' + data);
+
+        if (data.length == 0) {
+            res.redirect('/');
+        } else {
+            uid = data[0]._id;
+            console.log('nome utente ' + data[0].nome)
+            var uname = data[0].name;
+            query = { codice: uid };
+            var token = jwt.sign({ uid, admin: false }, config.secret);
+            res.cookie('jwt', token);
+            res.redirect('/');
+            /*     Sessione.find(query).then(function(data) {
+                     console.log('dati sessione  ' + data);
+                     console.log('stato sessione  ' + data[0].stato);
+                     if (data[0].stato == false) {
+                         Sessione.update({ codice: uid }, { stato: true }, function(raw) {
+                             console.log('raw message from mongo:  ' + raw);
+                             req.session.buser = data[0]._id;
+                             console.log('buser  ' + req.session.buser);
+                             res.redirect('/');
+                         });
 
 
-                    } else {
-                        req.session.buser = data[0]._id;
-                        console.log('loggato??  ' + dati.logged);
-                        res.redirect('/');
-                    }
-                });
-            }
-        });
-
+                     } else {
+                         req.session.buser = data[0]._id;
+                         console.log('loggato??  ' + dati.logged);
+                         res.redirect('/');
+                     }
+                 });*/
+        }
     });
+
+    // });
 
 });
 router.get('/logout', function(req, res, next) {
-    logging(req, function(dati) {
+    console.log(req.cookies.jwt)
+
+    res.clearCookie('jwt');
+    console.log(req.cookies.jwt)
+    res.redirect('/');
+    /*logging(req, function(dati) {
         var id = req.session.buser;
         req.session.destroy();
         var query = { _id: ObjectID(id) };
         Sessione.update(query, { stato: false }, function(data) {
             res.redirect('/');
         });
-    });
+    });*/
 });
 
 /* HOME */
@@ -94,36 +109,49 @@ router.post('/registrazione', function(req, res, next) {
         });
     } else {
         console.log(req.body);
-        logging(req, function(dati) {
-            Utenti.find(function(data) {
-                var newCode = 0;
-                if (data.length != 0)
-                    newCode = data[data.length - 1].codice + 1;
-                Utenti.create({ codice: Number(newCode), nome: req.body.nome, cognome: req.body.cognome, email: req.body.email, indirizzo: req.body.indirizzo, stato: req.body.stato, provincia: req.body.provincia, telefono: req.body.telefono, password: req.body.password, amministratore: false }, function(result) {
-                    var query = { codice: Number(result[0].codice) };
-                    Carrelli.create({ codice_utente: result[0]._id }, function(cartRes) {
-                        var uid;
-                        Ordini.create({ codice_utente: result[0]._id /*, ordine: arrayVuoto*/ }, function(ordine) {
-                            Utenti.find(query, function(data) {
-                                if (data.length == 0) {
-                                    res.render('index', { title: 'registrazione', contenuto: 'registrazione', errore: 'dati non corretti', auth: dati.logged });
-                                } else {
-                                    uid = data[0]._id;
-                                    query = { codice: uid };
-                                    Sessione.find(query).then(function(data) {
-                                        query = { codice: uid, stato: true };
-                                        Sessione.create(query, function(data) {
-                                            req.session.buser = data[0]._id;
-                                            res.redirect('/');
-                                        });
-                                    });
-                                }
-                            });
-                        });
+        //logging(req, function(dati) {
+        //  Utenti.find({}).then(function(data) {
+        console.log('------------------------------------');
+        console.log('1 step');
+        console.log('------------------------------------');
+        /* var newCode = 0;
+         if (data.length != 0)
+             newCode = data[data.length - 1].codice + 1;*/
+        Utenti.create({ nome: req.body.nome, cognome: req.body.cognome, email: req.body.email, indirizzo: req.body.indirizzo, stato: req.body.stato, provincia: req.body.provincia, telefono: req.body.telefono, password: req.body.password, amministratore: false }).then(function(result) {
+            console.log('------------------------------------' + result._id);
+            console.log('2 step');
+            //console.log('------------------------------------' + result[0]._id);
+            var query = { _id: result._id };
+            console.log('------------------------------------');
+            console.log('3 step');
+            console.log('------------------------------------');
+            Carrelli.create({ _id: result._id }).then(function(cartRes) {
+                var uid;
+                Ordini.create({ _id: result._id /*, ordine: arrayVuoto*/ }).then(function(ordine) {
+                    Utenti.find(query).then(function(data) {
+
+                        if (data.length == 0) {
+                            res.render('index', { title: 'registrazione', contenuto: 'registrazione', errore: 'dati non corretti', auth: dati.logged });
+                        } else {
+                            uid = data[0]._id;
+                            query = { codice: uid };
+                            var token = jwt.sign({ uid, admin: false }, config.secret);
+                            res.cookie('jwt', token);
+                            /*  Sessione.find(query).then(function(data) {
+                                  query = { codice: uid, stato: true };
+                                  Sessione.create(query, function(data) {
+                                      req.session.buser = data[0]._id;
+                                      res.redirect('/');
+                                  });
+                              });*/
+                            res.redirect('/');
+                        }
                     });
                 });
             });
         });
+        //});
+        //});
     }
 });
 /* REGISTRAZIONE */
@@ -579,14 +607,17 @@ router.post('/amministrazione/login', function(req, res, next) {
     });
 });
 router.get('/logout', function(req, res) {
-    var uid = req.session.buser;
-    req.session.destroy();
-    var query = { _id: ObjectID(uid) };
-    Sessione_backend.update(query, { stato: false }, function(data) {
-        Sessione_backend.remove({ stato: false }, function(data) {
-            res.redirect('/amministrazione/login');
-        });
-    });
+
+    res.clearCookie('jwt');
+    res.redirect('/amministrazione/login');
+    /*  var uid = req.session.buser;
+      req.session.destroy();
+      var query = { _id: ObjectID(uid) };
+      Sessione_backend.update(query, { stato: false }, function(data) {
+          Sessione_backend.remove({ stato: false }, function(data) {
+              res.redirect('/amministrazione/login');
+          });
+      });*/
 });
 
 router.get('/amministrazione/cerca', function(req, res, next) {
@@ -833,21 +864,43 @@ function logging(req, callback) {
         if (err) {
             res.send(err)
         }
-        console.log('dati collezione logging  ' + dati_collezione);
+        // console.log('dati collezione logging  ' + dati_collezione);
         out.prodotti = dati_collezione;
 
-        if (req.session.buser != undefined) {
-            //dovrebbe trovare la sessione relativa all'utente in base alla sessione
-            var query = { _id: ObjectID(req.session.buser), stato: true };
-            Sessione.find(query).then(function(data) {
-                if (data.length != 0) {
-                    out.userID = data[0].codice;
-                    out.logged = true;
-                }
-                callback(out);
-            });
-        } else
+        if (req.cookies.jwt == undefined || req.cookies.jwt == null) {
+            console.log('Token non presente');
+            out.logged = false;
             callback(out);
+
+        } else {
+            //console.log('token info ' + req.cookies.jwt);
+            jwt.verify(req.cookies.jwt, config.secret, function(err, decoded) {
+                if (err) {
+                    console.log('Token non valido');
+                    out.logged = false;
+                } else {
+                    console.log('Token valido');
+                    out.logged = true;
+                    out.userID = decoded.uid;
+                }
+            })
+        }
+
+
+        callback(out);
+
+        /* if (req.session.buser != undefined) {
+             //dovrebbe trovare la sessione relativa all'utente in base alla sessione
+             var query = { _id: ObjectID(req.session.buser), stato: true };
+             Sessione.find(query).then(function(data) {
+                 if (data.length != 0) {
+                     out.userID = data[0].codice;
+                     out.logged = true;
+                 }
+                 callback(out);
+             });
+         } else */
+
     }))
 };
 module.exports = router;

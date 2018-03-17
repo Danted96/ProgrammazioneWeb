@@ -14,6 +14,11 @@ var utentiSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    email: {
+        type: String,
+        required: true
+    },
+
     stato: {
         type: String,
         required: true
@@ -38,4 +43,4 @@ var utentiSchema = mongoose.Schema({
     }
 });
 
-var utenti = module.exports = mongoose.model('Utenti', utentiSchema,'Utenti');
+var utenti = module.exports = mongoose.model('Utenti', utentiSchema, 'Utenti');
