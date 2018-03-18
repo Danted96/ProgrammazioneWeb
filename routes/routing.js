@@ -346,7 +346,9 @@ router.get('/carrello', function(req, res, next) {
                 }
             });
         } else {
-            var carrello = (req.session.carrello != null) ? req.session.carrello : [];
+
+            res.redirect('/');
+            /*var carrello = (req.session.carrello != null) ? req.session.carrello : [];
             var aggiungilo = true;
             if (req.session.carrello != []) {
                 for (var i = 0; i < carrello.length; i++) {
@@ -366,7 +368,7 @@ router.get('/carrello', function(req, res, next) {
                     });
                 else
                     res.render('index', { title: 'carrello', contenuto: 'carrello', auth: dati.logged, carrello: carrello });
-            }
+            }*/
         }
     });
 });
@@ -553,26 +555,34 @@ router.post('/nuovaPassword', function(req, res, next) {
 
 /* PARTE AMMINISTRAZIONE */
 router.get('/amministrazione', function(req, res, next) {
-    loggingAmministratore(req, function(dati) {
+    logging(req, function(dati) {
 
 
-        if (req.session.buser !== undefined) {
-            var query = { _id: ObjectID(req.session.buser), stato: true };
-            Sessione_backend.find(query, function(data) {
-                if (data.length == 0) {
-                    req.session.destroy();
-                    res.redirect('/');
-                } else {
-                    res.render('backend/index', { title: 'amministrazione', contenuto: 'gestioneprodotti', prodotti: dati.prodotti, auth: dati.logged });
-                }
-            });
+
+        if (dati.logged == true) {
+            res.render('backend/index', { title: 'amministrazione', contenuto: 'gestioneprodotti', prodotti: dati.prodotti, auth: dati.logged });
         } else {
             res.redirect('/');
         }
+
+        /* if (req.session.buser !== undefined) {
+                 var query = { _id: ObjectID(req.session.buser), stato: true };
+                 Sessione_backend.find(query, function(data) {
+                     if (data.length == 0) {
+                         req.session.destroy();
+                         res.redirect('/');
+                     } else {
+                         res.render('backend/index', { title: 'amministrazione', contenuto: 'gestioneprodotti', prodotti: dati.prodotti, auth: dati.logged });
+                     }
+                 });
+             } else {
+                 res.redirect('/');
+             } */
     });
 });
 router.post('/amministrazione/login', function(req, res, next) {
-    loggingAmministratore(req, function(dati) {
+
+    logging(req, function(dati) {
         var query = { email: req.body.login_email, password: req.body.login_password, amministratore: true };
         console.log('query : ' + query);
         console.log(req.body);
@@ -583,25 +593,12 @@ router.post('/amministrazione/login', function(req, res, next) {
                 res.redirect('/');
             } else {
                 uid = data[0]._id;
+                console.log('nome utente ' + data[0].nome)
+                var uname = data[0].name;
                 query = { codice: uid };
-                Sessione_backend.find(query, function(data) {
-                    if (data.length == 0) {
-                        query = { codice: uid, stato: true };
-                        Sessione_backend.create(query, function(data) {
-                            req.session.buser = data[0]._id;
-                            res.redirect('/amministrazione');
-                        });
-                    } else {
-                        query = { codice: uid };
-                        Sessione_backend.update(query, { stato: false }, function(data) {
-                            query = { codice: uid, stato: true };
-                            Sessione_backend.create(query, function(data) {
-                                req.session.buser = data[0]._id;
-                                res.redirect('/amministrazione');
-                            });
-                        });
-                    }
-                });
+                var token = jwt.sign({ uid, admin: true }, config.secret);
+                res.cookie('jwt', token);
+                res.redirect('/amministrazione');
             }
         });
     });
@@ -656,54 +653,49 @@ router.get('/amministrazione/prodotto', function(req, res, next) {
 });
 
 router.post('/amministrazione/aggiungi', function(req, res, next) {
-    loggingAmministratore(req, function(dati) {
+    logging(req, function(dati) {
         var prodotto = { nome: req.body.nome, quantita: req.body.quantita, prezzo: req.body.prezzo, categoria: req.body.categoria, descrizione: req.body.descrizione };
         if (prodotto.nome == '' || prodotto.quantita == '' || prodotto.prezzo == '' || prodotto.categoria == '' || prodotto.descrizione == '') {
             res.render('backend/aggiungiprodotto', { errore: 'dati non corretti o incompleti', auth: dati.logged });
         }
-        if (req.session.buser !== undefined) {
-            var query = { _id: ObjectID(req.session.buser), stato: true };
-            Sessione_backend.find(query, function(data) {
-                if (data.length == 0) {
-                    res.redirect('/amministrazione/login');
-                } else {
-                    if (Number(prodotto.quantita) <= 5) {
-                        var transporter = nodemailer.createTransport({
-                            service: 'gmail',
-                            auth: {
-                                user: 'Noreplay.ProgettoPW@gmail.com',
-                                pass: 'Noreplayprogrammazioneweb'
-                            }
-                        });
+        if (dati.logged == true) {
 
-                        var mailOptions = {
-                            from: 'Noreplay.ProgettoPW@gmail.com',
-                            to: 'dante.domizi@studenti.unicam.it , william.taruschio@studenti.unicam.it',
-                            subject: 'immessa quantita scarsa',
-                            text: 'Prodotto "' + prodotto.nome + '" (cod. ' + prodotto._id + ')  , immesso solo ' + prodotto.quantita + ' pezzi.'
-                        };
-
-                        transporter.sendMail(mailOptions, function(error, info) {
-                            if (error) {
-                                console.log(error);
-                            } else {
-                                console.log('Email sent: ' + info.response);
-                            }
-                        });
+            if (Number(prodotto.quantita) <= 5) {
+                var transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        user: 'Noreplay.ProgettoPW@gmail.com',
+                        pass: 'Noreplayprogrammazioneweb'
                     }
-                    Prodotti.create({
-                        nome: prodotto.nome,
-                        descrizione: prodotto.descrizione,
-                        quantita: Number(prodotto.quantita),
-                        prezzo: parseFloat(prodotto.prezzo),
-                        categoria: prodotto.categoria,
-                        avverti_user: []
-                    }, function(data) {
-                        res.redirect('/amministrazione');
-                    });
+                });
 
-                }
+                var mailOptions = {
+                    from: 'Noreplay.ProgettoPW@gmail.com',
+                    to: 'dante.domizi@studenti.unicam.it , william.taruschio@studenti.unicam.it',
+                    subject: 'immessa quantita scarsa',
+                    text: 'Prodotto "' + prodotto.nome + '" (cod. ' + prodotto._id + ')  , immesso solo ' + prodotto.quantita + ' pezzi.'
+                };
+
+                transporter.sendMail(mailOptions, function(error, info) {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        console.log('Email sent: ' + info.response);
+                    }
+                });
+            }
+            Prodotti.create({
+                nome: prodotto.nome,
+                descrizione: prodotto.descrizione,
+                quantita: Number(prodotto.quantita),
+                prezzo: parseFloat(prodotto.prezzo),
+                categoria: prodotto.categoria,
+                avverti_user: []
+            }, function(data) {
+                res.redirect('/amministrazione');
             });
+
+
         } else
             res.redirect('/amministrazione/login');
     });
@@ -714,129 +706,121 @@ router.post('/amministrazione/update', function(req, res, next) {
 
     console.log('id prodotto : ' + salva_prodotto.id);
     console.log('salva prodotto : ' + salva_prodotto);
-    if (req.session.buser !== undefined) {
-        var query = { _id: ObjectID(req.session.buser), stato: true };
-        Sessione_backend.find(query, function(data) {
-            if (data.length == 0) {
-                res.redirect('/amministrazione/login');
-            } else {
-                if (Number(salva_prodotto.quantita) <= 5) {
-                    var transporter = nodemailer.createTransport({
-                        service: 'gmail',
-                        auth: {
-                            user: 'Noreplay.ProgettoPW@gmail.com',
-                            pass: 'Noreplayprogrammazioneweb'
-                        }
-                    });
 
-                    var mailOptions = {
-                        from: 'Noreplay.ProgettoPW@gmail.com',
-                        to: 'dante.domizi@studenti.unicam.it',
-                        subject: 'Prodotto "' + salva_prodotto.nome + '" (cod. ' + salva_prodotto.id + ') in esaurimento',
-                        text: 'rimangono solo ' + salva_prodotto.quantita + ' disponibili'
-                    };
+    logging(req, function(dati) {
+        if (dati.logged == true) {
+            if (Number(salva_prodotto.quantita) <= 5) {
+                var transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        user: 'Noreplay.ProgettoPW@gmail.com',
+                        pass: 'Noreplayprogrammazioneweb'
+                    }
+                });
 
-                    transporter.sendMail(mailOptions, function(error, info) {
-                        if (error) {
-                            console.log(error);
-                        } else {
-                            console.log('Email sent: ' + info.response);
-                        }
-                    });
-                }
-                Prodotti.update({ _id: ObjectID(salva_prodotto.id) }, {
-                    nome: salva_prodotto.nome,
-                    descrizione: salva_prodotto.descrizione,
-                    quantita: Number(salva_prodotto.quantita),
-                    prezzo: parseFloat(salva_prodotto.prezzo),
-                    categoria: salva_prodotto.categoria
-                }, function() {
-                    if (Number(salva_prodotto.quantita) > 0) {
-                        Prodotti.find({ _id: ObjectID(salva_prodotto.id) }).then(function(prodotto_da_segnalare) {
-                            var avvertendi = (prodotto_da_segnalare[0].avverti_user == '') ? [] : JSON.parse(prodotto_da_segnalare[0].avverti_user);
-                            for (var i = 0; i < avvertendi.length; i++) {
-                                var transporter = nodemailer.createTransport({
-                                    service: 'gmail',
-                                    auth: {
-                                        user: 'Noreplay.ProgettoPW@gmail.com',
-                                        pass: 'Noreplayprogrammazioneweb'
-                                    }
-                                });
+                var mailOptions = {
+                    from: 'Noreplay.ProgettoPW@gmail.com',
+                    to: 'dante.domizi@studenti.unicam.it',
+                    subject: 'Prodotto "' + salva_prodotto.nome + '" (cod. ' + salva_prodotto.id + ') in esaurimento',
+                    text: 'rimangono solo ' + salva_prodotto.quantita + ' disponibili'
+                };
 
-                                var mailOptions = {
-                                    from: 'Noreplay.ProgettoPW@gmail.com',
-                                    to: avvertendi[i],
-                                    subject: 'Prodotto "' + salva_prodotto.nome + '" (cod. ' + salva_prodotto.id + ') disponibile',
-                                    text: 'Il prodotto ' + salva_prodotto.nome + ' è nuovamente disponibile'
-                                };
-
-                                transporter.sendMail(mailOptions, function(error, info) {
-                                    if (error) {
-                                        console.log(error);
-                                    } else {
-                                        console.log('Email sent: ' + info.response);
-                                    }
-                                });
-                            }
-                            Prodotti.update({ _id: ObjectID(salva_prodotto.id) }, { avverti_user: [] }, function() {});
-                            res.redirect('/amministrazione');
-                        });
+                transporter.sendMail(mailOptions, function(error, info) {
+                    if (error) {
+                        console.log(error);
                     } else {
-                        res.redirect('/amministrazione');
+                        console.log('Email sent: ' + info.response);
                     }
                 });
             }
-        });
-    } else
-        res.redirect('/amministrazione/login');
+            Prodotti.update({ _id: ObjectID(salva_prodotto.id) }, {
+                nome: salva_prodotto.nome,
+                descrizione: salva_prodotto.descrizione,
+                quantita: Number(salva_prodotto.quantita),
+                prezzo: parseFloat(salva_prodotto.prezzo),
+                categoria: salva_prodotto.categoria
+            }).then(function() {
+                if (Number(salva_prodotto.quantita) > 0) {
+                    Prodotti.find({ _id: ObjectID(salva_prodotto.id) }).then(function(prodotto_da_segnalare) {
+                        var avvertendi = (prodotto_da_segnalare[0].avverti_user == '') ? [] : JSON.parse(prodotto_da_segnalare[0].avverti_user);
+                        for (var i = 0; i < avvertendi.length; i++) {
+                            var transporter = nodemailer.createTransport({
+                                service: 'gmail',
+                                auth: {
+                                    user: 'Noreplay.ProgettoPW@gmail.com',
+                                    pass: 'Noreplayprogrammazioneweb'
+                                }
+                            });
+
+                            var mailOptions = {
+                                from: 'Noreplay.ProgettoPW@gmail.com',
+                                to: avvertendi[i],
+                                subject: 'Prodotto "' + salva_prodotto.nome + '" (cod. ' + salva_prodotto.id + ') disponibile',
+                                text: 'Il prodotto ' + salva_prodotto.nome + ' è nuovamente disponibile'
+                            };
+
+                            transporter.sendMail(mailOptions, function(error, info) {
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    console.log('Email sent: ' + info.response);
+                                }
+                            });
+                        }
+                        Prodotti.update({ _id: ObjectID(salva_prodotto.id) }, { avverti_user: [] }).then(function() {});
+                        res.redirect('/amministrazione');
+                    });
+                } else {
+                    res.redirect('/amministrazione');
+                }
+            });
+        }
+    });
+
 });
 
 router.post('/amministrazione/delete', function(req, res, next) {
-    var id_prodotto = ObjectID(req.query.id);
-    console.log('id da eliminare : ' + id_prodotto);
-    if (req.session.buser !== undefined) {
-        var query = { _id: ObjectID(req.session.buser), stato: true };
-        Sessione_backend.find(query).then(function(data) {
-            if (data.length == 0) {
-                res.redirect('/amministrazione/login');
-            } else {
-                Prodotti.remove({ _id: id_prodotto }, function(data) {
-                    res.redirect('/amministrazione');
-                });
-            }
-        });
-    } else
-        res.redirect('/amministrazione/login');
+    logging(req, function(dati) {
+        var id_prodotto = ObjectID(req.query.id);
+        console.log('id da eliminare : ' + id_prodotto);
+        if (dati.logged == true) {
 
+            Prodotti.remove({ _id: id_prodotto }, function(data) {
+                res.redirect('/amministrazione');
+            });
+
+
+        } else
+            res.redirect('/amministrazione/login');
+    })
 });
 
 router.post('/upload', function(req, res, next) {
-    if (req.session.buser !== undefined) {
-        var query = { _id: ObjectID(req.session.buser), stato: true };
-        Sessione_backend.find(query, function(data) {
-            if (data.length == 0) {
-                res.redirect('/amministrazione/login');
-            } else {
-                console.log(req.files.file1);
-                var file_1 = req.files.file1;
+    logging(req, function(dati) {
+        if (dati.logged == true) {
 
-                file_1.mv('./public/images/prodotti/' + file_1.name, function(err) {
-                    if (err) {
-                        console.log(err);
-                        return res.send(err);
-                        //return res.status(500).send(err);
-                    }
 
-                });
-                res.redirect('/amministrazione/prodotto');
-            }
-        });
-    } else
-        res.redirect('/amministrazione/login');
+            console.log(req.files.file1);
+            var file_1 = req.files.file1;
+
+            file_1.mv('./public/images/prodotti/' + file_1.name, function(err) {
+                if (err) {
+                    console.log(err);
+                    return res.send(err);
+                    //return res.status(500).send(err);
+                }
+
+            });
+            res.redirect('/amministrazione/prodotto');
+
+
+        } else
+            res.redirect('/amministrazione/login');
+    })
 });
 
 
-function loggingAmministratore(req, callback) {
+/*function loggingAmministratore(req, callback) {
     var out = { prodotti: '', logged: false, userID: '' };
     Prodotti.find({}).then(function(err, dati_collezione) {
         if (err) {
@@ -856,7 +840,7 @@ function loggingAmministratore(req, callback) {
         } else
             callback(out);
     });
-};
+};*/
 
 function logging(req, callback) {
     var out = { prodotti: '', logged: false, userID: '' };
