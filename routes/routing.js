@@ -577,7 +577,7 @@ router.get('/amministrazione/prodotto', function (req, res, next) {
 
 router.post('/amministrazione/aggiungi', function (req, res, next) {
     logging(req, function (dati) {
-        var prodotto = { nome: req.body.nome, quantita: req.body.quantita, prezzo: req.body.prezzo, categoria: req.body.categoria, descrizione: req.body.descrizione };
+        var prodotto = { nome: req.body.nome, descrizione: req.body.descrizione, quantita: req.body.quantita, prezzo: req.body.prezzo, categoria: req.body.categoria };
         if (prodotto.nome == '' || prodotto.quantita == '' || prodotto.prezzo == '' || prodotto.categoria == '' || prodotto.descrizione == '') {
             res.render('backend/aggiungiprodotto', { errore: 'dati non corretti o incompleti', auth: dati.logged });
         }
@@ -617,7 +617,8 @@ router.post('/amministrazione/aggiungi', function (req, res, next) {
                 avverti_user: []
 
             })
-            Prodotti.create(nuovoProdotto, function (data) {
+            console.log('nuovo prodotto '+ nuovoProdotto);
+            Prodotti.create(nuovoProdotto).then( function (data) {
                 res.redirect('/amministrazione');
             });
 
