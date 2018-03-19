@@ -15,7 +15,7 @@
                             <% if(prodotti[i].quantita > 0){ %>
                                 <span class="disponibilità"> Disponibile </span>
                                 <p>
-                                    <button href="#" class="btn btn-primary " role="button" onclick="window.location = window.location.origin + '/carrello?add=<%- prodotti[i]._id %>';">Acquista</button>
+                                    <button href="#" class="btn btn-primary " role="button" onclick="window.location = window.location.origin + '/carrello/aggiungi?add=<%- prodotti[i]._id %>';">Acquista</button>
                                     <button href="#" class="btn btn-default" role="button" onclick="window.location = window.location.origin + '/prodotto?pro=<%- prodotti[i]._id %>';">Dettagli</button>
                                 </p>
 
