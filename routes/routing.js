@@ -21,21 +21,21 @@ var config = require('../config');
 
 /* HOME */
 
-router.get('/', function (req, res, next) {
-    logging(req, function (dati) {
+router.get('/', function(req, res, next) {
+    logging(req, function(dati) {
 
-        Prodotti.find(function (search_result) {
+        Prodotti.find(function(search_result) {
             res.render('index', { title: 'home', contenuto: 'prodotti', prodotti: dati.prodotti, auth: dati.logged });
         });
     });
 });
-router.post('/login', function (req, res, next) {
+router.post('/login', function(req, res, next) {
     // logging(req, function(dati) {
     var query = { email: req.body.login_email, password: req.body.login_password };
     console.log(query);
     console.log(req.body);
     var uid;
-    Utenti.find(query).then(function (data) {
+    Utenti.find(query).then(function(data) {
         console.log('utente :' + data);
 
         if (data.length == 0) {
@@ -58,7 +58,7 @@ router.post('/login', function (req, res, next) {
     // });
 
 });
-router.get('/logout', function (req, res, next) {
+router.get('/logout', function(req, res, next) {
     console.log(req.cookies.jwt)
 
     res.clearCookie('jwt');
@@ -71,17 +71,17 @@ router.get('/logout', function (req, res, next) {
 
 
 /* REGISTRAZIONE*/
-router.get('/registrazione', function (req, res) {
-    logging(req, function (dati) {
+router.get('/registrazione', function(req, res) {
+    logging(req, function(dati) {
         if (dati.logged == true)
             res.render('index', { title: 'il mio profilo', contenuto: 'profilo', contenuto_sub: 'datiutente', auth: dati.logged });
         else
             res.render('index', { title: 'registrazione', contenuto: 'registrazione', errore: null, auth: dati.logged });
     });
 });
-router.post('/registrazione', function (req, res, next) {
+router.post('/registrazione', function(req, res, next) {
     if (req.body.nome == '' || req.body.cognome == '' || req.body.email == '' || req.body.indirizzo == '' || req.body.stato == '' || req.body.provincia == '' || req.body.telefono == '' || req.body.password == '') {
-        logging(req, function (dati) {
+        logging(req, function(dati) {
             res.render('index', { title: 'registrazione', contenuto: 'registrazione', errore: 'dati non corretti', auth: dati.logged });
         });
     } else {
@@ -89,7 +89,7 @@ router.post('/registrazione', function (req, res, next) {
         console.log('------------------------------------');
         console.log('1 step');
         console.log('------------------------------------');
-        Utenti.create({ nome: req.body.nome, cognome: req.body.cognome, email: req.body.email, indirizzo: req.body.indirizzo, stato: req.body.stato, provincia: req.body.provincia, telefono: req.body.telefono, password: req.body.password, amministratore: false }).then(function (result) {
+        Utenti.create({ nome: req.body.nome, cognome: req.body.cognome, email: req.body.email, indirizzo: req.body.indirizzo, stato: req.body.stato, provincia: req.body.provincia, telefono: req.body.telefono, password: req.body.password, amministratore: false }).then(function(result) {
             console.log('------------------------------------' + result._id);
             console.log('2 step');
             //console.log('------------------------------------' + result[0]._id);
@@ -97,11 +97,11 @@ router.post('/registrazione', function (req, res, next) {
             console.log('------------------------------------');
             console.log('3 step');
             console.log('------------------------------------');
-            Carrelli.create({ _id: result._id }).then(function (cartRes) {
+            Carrelli.create({ _id: result._id }).then(function(cartRes) {
                 var uid;
-                Ordini.create({ _id: result._id }).then(function (ordine) {
-                    Utenti.find(query).then(function (data) {
-                        if (data.length == 0) {     // utente gia esistente, quindi effettua il login
+                Ordini.create({ _id: result._id }).then(function(ordine) {
+                    Utenti.find(query).then(function(data) {
+                        if (data.length == 0) { // utente gia esistente, quindi effettua il login
                             res.render('index', { title: 'registrazione', contenuto: 'registrazione', errore: 'dati non corretti', auth: dati.logged });
                         } else {
                             uid = data[0]._id;
@@ -123,31 +123,31 @@ router.post('/registrazione', function (req, res, next) {
 });
 /* REGISTRAZIONE */
 /* PROFILO */
-router.get('/profilo', function (req, res, next) {
-    logging(req, function (dati) {
+router.get('/profilo', function(req, res, next) {
+    logging(req, function(dati) {
         if (dati.logged == false)
             res.redirect('/');
         else {
-            Utenti.find({ _id: ObjectID(dati.userID) }).then(function (found) {
+            Utenti.find({ _id: ObjectID(dati.userID) }).then(function(found) {
                 res.render('index', { title: 'il mio profilo', contenuto: 'profilo', contenuto_sub: 'datiutente', auth: dati.logged, dati_utente: found[0] });
             });
         }
     });
 });
-router.get('/profilo/storicoordini', function (req, res, next) {
-    logging(req, function (dati) {
+router.get('/profilo/storicoordini', function(req, res, next) {
+    logging(req, function(dati) {
         if (dati.logged == false) {
             res.redirect('/');
         } else {
-            Ordini.find({ codice_utente: dati.userID }).then(function (ordine) {
+            Ordini.find({ codice_utente: dati.userID }).then(function(ordine) {
                 res.render('index', { title: 'il mio profilo', contenuto: 'profilo', contenuto_sub: 'storicoordini', ordini: (ordine[0].ordine), auth: dati.logged });
 
             });
         }
     });
 });
-router.post('/modificaprofilo', function (req, res, next) {
-    logging(req, function (dati) {
+router.post('/modificaprofilo', function(req, res, next) {
+    logging(req, function(dati) {
         if (dati.logged == false) {
             res.redirect('/');
         } else {
@@ -155,7 +155,7 @@ router.post('/modificaprofilo', function (req, res, next) {
                 res.render('index', { title: 'registrazione', contenuto: 'registrazione', errore: 'dati non corretti', auth: dati.logged });
             } else {
                 console.log('id : ' + dati.userID);
-                Utenti.update({ _id: ObjectID(dati.userID) }, { nome: req.body.nome, cognome: req.body.cognome, email: req.body.email, indirizzo: req.body.indirizzo, stato: req.body.stato, provincia: req.body.provincia, telefono: req.body.telefono, password: req.body.password }, function (data) {
+                Utenti.update({ _id: ObjectID(dati.userID) }, { nome: req.body.nome, cognome: req.body.cognome, email: req.body.email, indirizzo: req.body.indirizzo, stato: req.body.stato, provincia: req.body.provincia, telefono: req.body.telefono, password: req.body.password }, function(data) {
                     console.log('profilo modificato');
                     res.redirect('/profilo');
 
@@ -169,7 +169,7 @@ router.post('/modificaprofilo', function (req, res, next) {
 /* PROFILO */
 
 /* PRODOTTO */
-router.get('/prodotto', function (req, res, next) {
+router.get('/prodotto', function(req, res, next) {
 
     var codice_prodotto = req.query.pro;
     console.log('codice del prodotto' + req.query.pro);
@@ -178,8 +178,8 @@ router.get('/prodotto', function (req, res, next) {
     /*esegue la funzione logging per vedere se è loggato o no,
      in quanto se è loggato cambiano alcune cose nella visione del prodotto */
 
-    logging(req, function (dati) {
-        Prodotti.find({ _id: ObjectID(codice_prodotto) }).then(function (dati_prodotto) {
+    logging(req, function(dati) {
+        Prodotti.find({ _id: ObjectID(codice_prodotto) }).then(function(dati_prodotto) {
             res.render('index', {
                 title: 'prodotto',
                 contenuto: 'prodotto',
@@ -195,12 +195,12 @@ router.get('/prodotto', function (req, res, next) {
 function escapeRegex(text) { //regex per la ricerca del nome dei prodotti
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 };
-router.get('/cerca', function (req, res, next) {
-    logging(req, function (dati) {
+router.get('/cerca', function(req, res, next) {
+    logging(req, function(dati) {
         if (req.query.search) {
             const regex = new RegExp(escapeRegex(req.query.search), 'gi');
             console.log('regex' + regex);
-            Prodotti.find({ nome: regex }).then(function (dati_ricerca) {
+            Prodotti.find({ nome: regex }).then(function(dati_ricerca) {
                 console.log('prodotti ricercati: ' + dati_ricerca[0]);
                 res.render('index', { title: 'home', contenuto: 'prodotti', prodotti: dati_ricerca, auth: dati.logged });
 
@@ -212,12 +212,12 @@ router.get('/cerca', function (req, res, next) {
 });
 
 /* CATEGORIA */
-router.get('/categoria', function (req, res, next) {
+router.get('/categoria', function(req, res, next) {
 
     var categoria_prodotto = req.query.cat;
     console.log('categoria del prodotto ' + req.query.cat);
-    logging(req, function (dati) {
-        Prodotti.find({ categoria: req.query.cat }).then(function (dati_prodotto) {
+    logging(req, function(dati) {
+        Prodotti.find({ categoria: req.query.cat }).then(function(dati_prodotto) {
             console.log('dati prodotto categoria' + dati_prodotto);
             res.render('index', {
                 title: 'prodotto',
@@ -228,21 +228,21 @@ router.get('/categoria', function (req, res, next) {
         });
     });
 });
-router.post('/avvertimi', function (req, res, next) {
+router.post('/avvertimi', function(req, res, next) {
     var codice_prodotto = req.body.codice;
-    logging(req, function (dati) {
+    logging(req, function(dati) {
         if (dati.logged == false) {
             res.redirect('/');
         } else {
-            Prodotti.find({ _id: ObjectID(codice_prodotto) }).then(function (search_result) {
+            Prodotti.find({ _id: ObjectID(codice_prodotto) }).then(function(search_result) {
                 var prodotto = search_result[0];
                 var avvertendi = (prodotto.avverti_user == '') ? [] : JSON.parse(prodotto.avverti_user);
-                Utenti.find({ _id: ObjectID(dati.userID) }).then(function (utente) {
+                Utenti.find({ _id: ObjectID(dati.userID) }).then(function(utente) {
                     avvertendi.push(utente[0].email);
 
                     //aggiorna l'array contente le email da avvertire in caso il prodotto ritornasse disponibile
 
-                    Prodotti.update({ _id: ObjectID(codice_prodotto) }, { avverti_user: JSON.stringify(avvertendi) }, function (result) {
+                    Prodotti.update({ _id: ObjectID(codice_prodotto) }, { avverti_user: JSON.stringify(avvertendi) }, function(result) {
                         res.send('OK');
                     });
                 });
@@ -252,13 +252,13 @@ router.post('/avvertimi', function (req, res, next) {
 });
 
 /* CARRELLO */
-router.get('/carrello', function (req, res, next) {
+router.get('/carrello', function(req, res, next) {
 
-    logging(req, function (dati) {
+    logging(req, function(dati) {
         if (dati.logged == true) {
-            Utenti.find({ _id: ObjectID(dati.userID) }).then(function (utente) {
+            Utenti.find({ _id: ObjectID(dati.userID) }).then(function(utente) {
                 var codice_utente = utente[0]._id;
-                Carrelli.find({ codice_utente: codice_utente }).then(function (carrello_utente) {
+                Carrelli.find({ codice_utente: codice_utente }).then(function(carrello_utente) {
                     carrello = JSON.parse(carrello_utente[0].carrello);
                     console.log('carrello ---------- ' + JSON.parse(carrello_utente[0].carrello));
                     res.render('index', { title: 'carrello', contenuto: 'carrello', auth: dati.logged, carrello: carrello });
@@ -273,18 +273,18 @@ router.get('/carrello', function (req, res, next) {
 });
 
 //aggiunge il prodotto selezionato al carrello
-router.get('/carrello/aggiungi', function (req, res, next) {
+router.get('/carrello/aggiungi', function(req, res, next) {
     var aggiungi = req.query.add;
     console.log('aggiungi : ' + req.query.add);
-    logging(req, function (dati) {
+    logging(req, function(dati) {
         if (dati.logged == true) {
-            Carrelli.find({ codice_utente: dati.userID }).then(function (carrello_utente) {
+            Carrelli.find({ codice_utente: dati.userID }).then(function(carrello_utente) {
                 carrello = JSON.parse(carrello_utente[0].carrello);
 
                 if (aggiungi == undefined) {
                     res.render('index', { title: 'carrello', contenuto: 'carrello', auth: dati.logged, carrello: carrello });
                 } else {
-                    Prodotti.find({ _id: ObjectID(aggiungi) }).then(function (oggetto) {
+                    Prodotti.find({ _id: ObjectID(aggiungi) }).then(function(oggetto) {
                         oggetto[0].quantita = 1;
                         carrello.push(JSON.stringify(oggetto[0]));
                         console.log('carrello +++++++++++ : ' + (oggetto[0]));
@@ -299,18 +299,18 @@ router.get('/carrello/aggiungi', function (req, res, next) {
         }
     });
 });
-router.post('/carrello/remove', function (req, res, next) {
+router.post('/carrello/remove', function(req, res, next) {
 
 
     console.log('indice : ' + req.body.index);
-    logging(req, function (dati) {
+    logging(req, function(dati) {
         if (dati.logged == true) {
-            Carrelli.find({ codice_utente: dati.userID }).then(function (carrello_utente) {
+            Carrelli.find({ codice_utente: dati.userID }).then(function(carrello_utente) {
                 carrello = JSON.parse(carrello_utente[0].carrello);
                 carrello.splice(req.body.index, 1);
-                Utenti.find({ _id: ObjectID(dati.userID) }).then(function (utente) {
+                Utenti.find({ _id: ObjectID(dati.userID) }).then(function(utente) {
                     var codice_utente = utente[0]._id;
-                    Carrelli.update({ codice_utente: codice_utente }, { carrello: JSON.stringify(carrello) }, function (result) {
+                    Carrelli.update({ codice_utente: codice_utente }, { carrello: JSON.stringify(carrello) }, function(result) {
                         res.send('ok');
                     });
                 });
@@ -321,10 +321,10 @@ router.post('/carrello/remove', function (req, res, next) {
     });
 });
 //aggiorna la quantità del prodotto nel carrello
-router.post('/carrello/update', function (req, res, next) {
-    logging(req, function (dati) {
+router.post('/carrello/update', function(req, res, next) {
+    logging(req, function(dati) {
         if (dati.logged == true) {
-            Carrelli.find({ codice_utente: dati.userID }).then(function (carrello_utente) {
+            Carrelli.find({ codice_utente: dati.userID }).then(function(carrello_utente) {
                 carrello = JSON.parse(carrello_utente[0].carrello);
                 console.log('carrello  3: ' + carrello);
                 for (var i = 0; i < carrello.length; i++) {
@@ -337,7 +337,7 @@ router.post('/carrello/update', function (req, res, next) {
                         console.log('carrello : ' + carrello[i]);
                     }
                 }
-                Carrelli.update({ codice_utente: dati.userID }, { carrello: JSON.stringify(carrello) }, function (result) {
+                Carrelli.update({ codice_utente: dati.userID }, { carrello: JSON.stringify(carrello) }, function(result) {
                     res.render('index', { title: 'carrello', contenuto: 'carrello', auth: dati.logged, carrello: carrello });
                 });
             });
@@ -348,90 +348,174 @@ router.post('/carrello/update', function (req, res, next) {
 });
 
 
-router.get('/carrello/acquista', function (req, res, next) {
-    logging(req, function (dati) {
+router.get('/carrello/acquista', function(req, res, next) {
+    var prodottinelcarrello = [];
+
+    logging(req, function(dati) {
         if (dati.logged == false) {
             res.redirect('/');
         } else {
-            Carrelli.find({ codice_utente: dati.userID }).then(function (carrello_utente) {
+            Carrelli.find({ codice_utente: dati.userID }).then(function(carrello_utente) {
                 carrello = JSON.parse(carrello_utente[0].carrello);
-
 
                 for (var i = 0; i < carrello.length; i++) {
                     var singoloProdotto = JSON.parse(carrello[i]);
-                    console.log('carrello quantita : ' + singoloProdotto.quantita);
-                    console.log('prodotto id : ' + singoloProdotto._id);
-                    var quantity;
-
-                    Prodotti.find({ _id: ObjectID(singoloProdotto._id) }).then(function (prodotto) {
-                        if (singoloProdotto.quantita > prodotto[0].quantita) {
-                            function alert() {
-                                alert('quantita richiesta superiore a quella disponibile!');
-                            }
-                            res.redirect('/carrello');
-                        }
-                        console.log('vecchia quantita : ' + prodotto[0].quantita);
-                        quantity = prodotto[0].quantita - singoloProdotto.quantita;
-
-
-
-
-                        if (Number(quantity) <= 5) {
-                            var transporter = nodemailer.createTransport({
-                                service: 'gmail',
-                                auth: {
-                                    user: 'Noreplay.ProgettoPW@gmail.com',
-                                    pass: 'Noreplayprogrammazioneweb'
-                                }
-                            });
-
-                            var mailOptions = {
-                                from: 'Noreplay.ProgettoPW@gmail.com',
-                                to: ['william.taruschio@studenti.unicam.it', 'dante.domizi@studenti.unicam.it'],
-                                subject: 'Prodotto in esaurimento',
-                                text: 'Prodotto "' + singoloProdotto.nome + '" (cod. ' + singoloProdotto._id + ') in esaurimento' + 'rimangono solo ' + quantity + ' disponibili.'
-                            }
-
-                            transporter.sendMail(mailOptions, function (error, info) {
-                                if (error) {
-                                    console.log(error);
-                                } else {
-                                    console.log('Email sent: ' + info.response);
-                                }
-                            });
-                        }
-
-
-                        var data = new Date();
-                        var ordine;
-                        Ordini.find({ codice_utente: ObjectID(dati.userID) }).then(function (ORDINE) {
-                            ordine = ORDINE[0].ordine;
-                            console.log('ordine : ' + ordine);
-                            ordine.push({
-
-                                "data": data.toUTCString(),
-                                "nome": singoloProdotto.nome,
-                                "quantita": singoloProdotto.quantita,
-                                "prezzo": singoloProdotto.prezzo,
-
-                            });
-                            Ordini.update({ codice_utente: ObjectID(dati.userID) }, { ordine: (ordine) }, function (ORDINE) {
-
-                            });
-                            Prodotti.update({ _id: ObjectID(singoloProdotto._id) }, { quantita: (quantity) }, function (QT) {
-
-                            });
-
-
-                        });
-                    });
-
-
+                    prodottinelcarrello[i] = singoloProdotto
+                    console.log('------------------------------------');
+                    console.log(prodottinelcarrello[i]._id);
+                    console.log('------------------------------------');
                 }
+                console.log('------------------------------------');
+                console.log(prodottinelcarrello.length);
+                console.log('------------------------------------');
+                var quantity;
+                // res.redirect('/carrello');
+                prodottinelcarrello.forEach(function(singoloProdotto) {
+                        var ordini = [];
+                        console.log('------------------------------------');
+                        console.log(singoloProdotto._id);
+                        console.log('------------------------------------');
+                        Prodotti.find({ _id: ObjectID(singoloProdotto._id) }).then(function(prodotto) {
+                            quantity = prodotto[0].quantita - singoloProdotto.quantita;
+                            Prodotti.update({ _id: ObjectID(singoloProdotto._id) }, { quantita: (quantity) }, function(QT) {
+                                console.log('------------------------------------');
+                                console.log('okkkk');
+                                console.log('------------------------------------');
+
+                                if (Number(quantity) <= 5) {
+                                    var transporter = nodemailer.createTransport({
+                                        service: 'gmail',
+                                        auth: {
+                                            user: 'Noreplay.ProgettoPW@gmail.com',
+                                            pass: 'Noreplayprogrammazioneweb'
+                                        }
+                                    });
+
+                                    var mailOptions = {
+                                        from: 'Noreplay.ProgettoPW@gmail.com',
+                                        to: ['william.taruschio@studenti.unicam.it', 'dante.domizi@studenti.unicam.it'],
+                                        subject: 'Prodotto in esaurimento',
+                                        text: 'Prodotto "' + singoloProdotto.nome + '" (cod. ' + singoloProdotto._id + ') in esaurimento' + 'rimangono solo ' + quantity + ' disponibili.'
+                                    }
+
+                                    transporter.sendMail(mailOptions, function(error, info) {
+                                        if (error) {
+                                            console.log(error);
+                                        } else {
+                                            console.log('Email sent: ' + info.response);
+                                        }
+                                    });
+                                }
+                                var data = new Date();
+                                ordini.push({
+
+                                    "data": data.toUTCString(),
+                                    "nome": singoloProdotto.nome,
+                                    "quantita": Number(singoloProdotto.quantita),
+                                    "prezzo": parseFloat(singoloProdotto.prezzo),
+
+                                });
+
+                                console.log('------------------------------------');
+                                console.log('ordini  ' + JSON.stringify(ordini));
+                                console.log('------------------------------------');
+                                Ordini.findOneAndUpdate({ codice_utente: ObjectID(dati.userID) }, { $push: { ordine: ordini } }, function(err, nuovoOrdine) {
+                                    if (err) {
+                                        console.log('------------------------------------');
+                                        console.log('errore' + err);
+                                        console.log('------------------------------------');
+                                    }
+                                    console.log('------------------------------------');
+                                    console.log('ordine aggiunto  ' + JSON.stringify(ordini));
+                                    console.log('------------------------------------');
+                                    console.log('------------------------------------');
+                                    console.log('nuovoOrdine     ' + JSON.stringify(nuovoOrdine.ordine));
+                                    console.log('------------------------------------');
+                                });
+
+                            });
+                        })
+                    }
+
+                )
+
+
+                /*  for (var i = 0; i < carrello.length; i++) {
+                      var singoloProdotto = JSON.parse(carrello[i]);
+                      console.log('carrello quantita : ' + singoloProdotto.quantita);
+                      console.log('prodotto id : ' + singoloProdotto._id);
+                      var quantity;
+
+                      Prodotti.find({ _id: ObjectID(singoloProdotto._id) }).then(function(prodotto) {
+                          if (singoloProdotto.quantita > prodotto[0].quantita) {
+                              function alert() {
+                                  alert('quantita richiesta superiore a quella disponibile!');
+                              }
+                              res.redirect('/carrello');
+                          }
+                          console.log('vecchia quantita : ' + prodotto[0].quantita);
+                          quantity = prodotto[0].quantita - singoloProdotto.quantita;
+
+
+
+
+                          if (Number(quantity) <= 5) {
+                              var transporter = nodemailer.createTransport({
+                                  service: 'gmail',
+                                  auth: {
+                                      user: 'Noreplay.ProgettoPW@gmail.com',
+                                      pass: 'Noreplayprogrammazioneweb'
+                                  }
+                              });
+
+                              var mailOptions = {
+                                  from: 'Noreplay.ProgettoPW@gmail.com',
+                                  to: ['william.taruschio@studenti.unicam.it', 'dante.domizi@studenti.unicam.it'],
+                                  subject: 'Prodotto in esaurimento',
+                                  text: 'Prodotto "' + singoloProdotto.nome + '" (cod. ' + singoloProdotto._id + ') in esaurimento' + 'rimangono solo ' + quantity + ' disponibili.'
+                              }
+
+                              transporter.sendMail(mailOptions, function(error, info) {
+                                  if (error) {
+                                      console.log(error);
+                                  } else {
+                                      console.log('Email sent: ' + info.response);
+                                  }
+                              });
+                          }
+
+
+                          var data = new Date();
+                          var ordine;
+                          Ordini.find({ codice_utente: ObjectID(dati.userID) }).then(function(ORDINE) {
+                              ordine = ORDINE[0].ordine;
+                              console.log('ordine : ' + ordine);
+                              ordine.push({
+
+                                  "data": data.toUTCString(),
+                                  "nome": singoloProdotto.nome,
+                                  "quantita": singoloProdotto.quantita,
+                                  "prezzo": singoloProdotto.prezzo,
+
+                              });
+                              Ordini.update({ codice_utente: ObjectID(dati.userID) }, { ordine: (ordine) }, function(ORDINE) {
+
+                              });
+                              Prodotti.update({ _id: ObjectID(singoloProdotto._id) }, { quantita: (quantity) }, function(QT) {
+
+                              });
+
+
+                          });
+                      });
+
+
+                  }
+                  */
                 carrello = carrello.splice(carrello.length, 0);
 
                 console.log('carrello dopo : ' + carrello);
-                Carrelli.update({ codice_utente: dati.userID }, { carrello: JSON.stringify(carrello) }, function (result) {
+                Carrelli.update({ codice_utente: dati.userID }, { carrello: JSON.stringify(carrello) }, function(result) {
                     res.redirect('/carrello');
                 });
 
@@ -446,24 +530,24 @@ router.get('/carrello/acquista', function (req, res, next) {
 });
 
 /* PASSWORD */
-router.get('/passwordDimenticata', function (req, res, next) {
-    logging(req, function (dati) {
+router.get('/passwordDimenticata', function(req, res, next) {
+    logging(req, function(dati) {
         res.render('index', { title: 'home', contenuto: 'passwordDimenticata', auth: dati.logged })
 
     });
 
 });
-router.post('/nuovaPassword', function (req, res, next) {
+router.post('/nuovaPassword', function(req, res, next) {
     console.log('corpo : ' + req.body.password1);
     var email = req.body.emailnuovapassword;
     var password = req.body.password1;
     var confermapassword = req.body.password2;
     if (email == '' || password == '' || confermapassword == '') {
-        logging(req, function (dati) {
+        logging(req, function(dati) {
             res.redirect('/');
         });
     } else if (password == confermapassword) {
-        Utenti.update({ email: email }, { password: password }, function (result) {
+        Utenti.update({ email: email }, { password: password }, function(result) {
             var transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
@@ -479,7 +563,7 @@ router.post('/nuovaPassword', function (req, res, next) {
                 text: 'La tua nuova password è ' + password
             };
 
-            transporter.sendMail(mailOptions, function (error, info) {
+            transporter.sendMail(mailOptions, function(error, info) {
                 if (error) {
                     console.log(error);
                 } else {
@@ -495,8 +579,8 @@ router.post('/nuovaPassword', function (req, res, next) {
 });
 
 /* PARTE AMMINISTRAZIONE */
-router.get('/amministrazione', function (req, res, next) {
-    logging(req, function (dati) {
+router.get('/amministrazione', function(req, res, next) {
+    logging(req, function(dati) {
 
         if (dati.logged == true) {
             res.render('backend/index', { title: 'amministrazione', contenuto: 'gestioneprodotti', prodotti: dati.prodotti, auth: dati.logged });
@@ -506,14 +590,14 @@ router.get('/amministrazione', function (req, res, next) {
 
     });
 });
-router.post('/amministrazione/login', function (req, res, next) {
+router.post('/amministrazione/login', function(req, res, next) {
 
-    logging(req, function (dati) {
+    logging(req, function(dati) {
         var query = { email: req.body.login_email, password: req.body.login_password, amministratore: true };
         console.log('query : ' + query);
         console.log(req.body);
         var uid;
-        Utenti.find(query).then(function (data) {
+        Utenti.find(query).then(function(data) {
             console.log(data);
             if (data.length == 0) {
                 res.redirect('/');
@@ -529,19 +613,19 @@ router.post('/amministrazione/login', function (req, res, next) {
         });
     });
 });
-router.get('/logout', function (req, res) {
+router.get('/logout', function(req, res) {
 
     res.clearCookie('jwt');
     res.redirect('/amministrazione/login');
 
 });
 
-router.get('/amministrazione/cerca', function (req, res, next) {
-    logging(req, function (dati) {
+router.get('/amministrazione/cerca', function(req, res, next) {
+    logging(req, function(dati) {
         if (req.query.search) {
             const regex = new RegExp(escapeRegex(req.query.search), 'gi');
             console.log('regex' + regex);
-            Prodotti.find({ nome: regex }).then(function (dati_ricerca) {
+            Prodotti.find({ nome: regex }).then(function(dati_ricerca) {
                 console.log('prodotti ricercati: ' + dati_ricerca[0]);
                 res.render('backend/index', { title: 'amministrazione', contenuto: 'gestioneprodotti', prodotti: dati_ricerca, auth: dati.logged });
 
@@ -552,15 +636,15 @@ router.get('/amministrazione/cerca', function (req, res, next) {
     });
 });
 
-router.get('/amministrazione/prodotto', function (req, res, next) {
+router.get('/amministrazione/prodotto', function(req, res, next) {
 
     var codice_prodotto = req.query.pro;
     console.log('codice del prodotto' + req.query.pro);
     var _id = (codice_prodotto);
     console.log('id  ' + _id);
-    logging(req, function (dati) {
+    logging(req, function(dati) {
         if (dati.logged == true) {
-            Prodotti.find({ _id: ObjectID(codice_prodotto) }).then(function (dati_prodotto) {
+            Prodotti.find({ _id: ObjectID(codice_prodotto) }).then(function(dati_prodotto) {
                 res.render('backend/index', {
                     title: 'prodotto',
                     contenuto: 'aggiungiprodotto',
@@ -575,12 +659,22 @@ router.get('/amministrazione/prodotto', function (req, res, next) {
     });
 });
 
-router.post('/amministrazione/aggiungi', function (req, res, next) {
-    logging(req, function (dati) {
+router.post('/amministrazione/aggiungi', function(req, res, next) {
+    logging(req, function(dati) {
         var prodotto = { nome: req.body.nome, descrizione: req.body.descrizione, quantita: req.body.quantita, prezzo: req.body.prezzo, categoria: req.body.categoria };
         if (prodotto.nome == '' || prodotto.quantita == '' || prodotto.prezzo == '' || prodotto.categoria == '' || prodotto.descrizione == '') {
             res.render('backend/aggiungiprodotto', { errore: 'dati non corretti o incompleti', auth: dati.logged });
         }
+        if (prodotto.quantita < 0 || prodotto.prezzo < 0) {
+            res.render('backend/aggiungiprodotto', { errore: 'dati non corretti o incompleti', auth: dati.logged });
+        }
+        if (prodotto.nome != undefined || prodotto.quantita != undefined || prodotto.prezzo != undefined || prodotto.descrizione != undefined || prodotto.categoria != undefined) {
+            res.render('backend/aggiungiprodotto', { errore: 'dati non corretti o incompleti', auth: dati.logged });
+        }
+        /*if (!(isNumber(prodotto.quantita)) || !(isNumber(prodotto.prezzo))) {
+            res.render('backend/aggiungiprodotto', { errore: 'la quantità e il prezzo devo essere valori numerici', auth: dati.logged });
+
+        }*/
         if (dati.logged == true) {
 
             if (Number(prodotto.quantita) <= 5) {
@@ -599,7 +693,7 @@ router.post('/amministrazione/aggiungi', function (req, res, next) {
                     text: 'Prodotto "' + prodotto.nome + '" (cod. ' + prodotto._id + ')  , immesso solo ' + prodotto.quantita + ' pezzi.'
                 };
 
-                transporter.sendMail(mailOptions, function (error, info) {
+                transporter.sendMail(mailOptions, function(error, info) {
                     if (error) {
                         console.log(error);
                     } else {
@@ -618,7 +712,7 @@ router.post('/amministrazione/aggiungi', function (req, res, next) {
 
             })
             console.log('nuovo prodotto ' + nuovoProdotto);
-            Prodotti.create(nuovoProdotto).then(function (data) {
+            Prodotti.create(nuovoProdotto).then(function(data) {
                 res.redirect('/amministrazione');
             });
 
@@ -628,13 +722,27 @@ router.post('/amministrazione/aggiungi', function (req, res, next) {
     });
 });
 
-router.post('/amministrazione/update', function (req, res, next) {
+router.post('/amministrazione/update', function(req, res, next) {
     var salva_prodotto = { id: req.body.id, nome: req.body.nome, quantita: req.body.quantita, prezzo: req.body.prezzo, categoria: req.body.categoria, descrizione: req.body.descrizione };
 
+
+    /* if (salva_prodotto.nome == '' || salva_prodotto.quantita == '' || salva_prodotto.prezzo == '' || salva_prodotto.categoria == '' || salva_prodotto.descrizione == '') {
+          res.render('backend/gestioneprodotto', { errore: 'dati non corretti o incompleti', auth: dati.logged });
+      }
+      if (salva_prodotto.quantita < 0 || salva_prodotto.prezzo < 0) {
+          res.render('backend/gestioneprodotto', { errore: 'la quantità e il prezzo devono avere valori positivi', auth: dati.logged });
+      }
+      if (salva_prodotto.nome != undefined || salva_prodotto.quantita != undefined || salva_prodotto.prezzo != undefined || salva_prodotto.descrizione != undefined || prodotto.categoria != undefined) {
+          res.render('backend/gestioneprodotto', { errore: 'dati non corretti o incompleti', auth: dati.logged });
+      }
+      if (!(isNumber(salva_prodotto.quantita)) || !(isNumber(salva_prodotto.prezzo))) {
+          res.render('backend/gestioneprodotto', { errore: 'la quantità e il prezzo devo essere valori numerici', auth: dati.logged });
+
+      }*/
     console.log('id prodotto : ' + salva_prodotto.id);
     console.log('salva prodotto : ' + JSON.stringify(salva_prodotto));
 
-    logging(req, function (dati) {
+    logging(req, function(dati) {
         if (dati.logged == true) {
             if (Number(salva_prodotto.quantita) <= 5) {
                 var transporter = nodemailer.createTransport({
@@ -652,7 +760,7 @@ router.post('/amministrazione/update', function (req, res, next) {
                     text: 'rimangono solo ' + salva_prodotto.quantita + ' disponibili'
                 };
 
-                transporter.sendMail(mailOptions, function (error, info) {
+                transporter.sendMail(mailOptions, function(error, info) {
                     if (error) {
                         console.log(error);
                     } else {
@@ -666,9 +774,9 @@ router.post('/amministrazione/update', function (req, res, next) {
                 quantita: Number(salva_prodotto.quantita),
                 prezzo: parseFloat(salva_prodotto.prezzo),
                 categoria: salva_prodotto.categoria
-            }, { new: true }, function (err, prodottoAggiornato) {  //ritorna il prodotto aggiornato
+            }, { new: true }, function(err, prodottoAggiornato) { //ritorna il prodotto aggiornato
                 if (err) console.log(err);
-                if (Number(prodottoAggiornato.quantita) > 5) {  //se la quantita del prodotto aggiornato è maggiore di 5 avverte gli utenti.
+                if (Number(prodottoAggiornato.quantita) > 5) { //se la quantita del prodotto aggiornato è maggiore di 5 avverte gli utenti.
 
                     var avvertendi = (prodottoAggiornato.avverti_user == '') ? [] : JSON.parse(prodottoAggiornato.avverti_user);
                     for (var i = 0; i < avvertendi.length; i++) {
@@ -687,7 +795,7 @@ router.post('/amministrazione/update', function (req, res, next) {
                             text: 'Il prodotto ' + salva_prodotto.nome + ' è nuovamente disponibile'
                         };
 
-                        transporter.sendMail(mailOptions, function (error, info) {
+                        transporter.sendMail(mailOptions, function(error, info) {
                             if (error) {
                                 console.log(error);
                             } else {
@@ -707,13 +815,13 @@ router.post('/amministrazione/update', function (req, res, next) {
 
 });
 
-router.post('/amministrazione/delete', function (req, res, next) {
-    logging(req, function (dati) {
+router.post('/amministrazione/delete', function(req, res, next) {
+    logging(req, function(dati) {
         var id_prodotto = ObjectID(req.query.id);
         console.log('id da eliminare : ' + id_prodotto);
         if (dati.logged == true) {
 
-            Prodotti.remove({ _id: id_prodotto }, function (data) {
+            Prodotti.remove({ _id: id_prodotto }, function(data) {
                 res.redirect('/amministrazione');
             });
 
@@ -725,15 +833,15 @@ router.post('/amministrazione/delete', function (req, res, next) {
 
 
 //upload immagine
-router.post('/upload', function (req, res, next) {
-    logging(req, function (dati) {
+router.post('/upload', function(req, res, next) {
+    logging(req, function(dati) {
         if (dati.logged == true) {
 
 
             console.log(req.files.file1);
             var file_1 = req.files.file1;
 
-            file_1.mv('./public/images/prodotti/' + file_1.name, function (err) {
+            file_1.mv('./public/images/prodotti/' + file_1.name, function(err) {
                 if (err) {
                     console.log(err);
                     return res.send(err);
@@ -777,7 +885,7 @@ router.post('/upload', function (req, res, next) {
 
 function logging(req, callback) {
     var out = { prodotti: '', logged: false, userID: '' };
-    Prodotti.find({}, function (err, dati_collezione) {
+    Prodotti.find({}, function(err, dati_collezione) {
         if (err) {
             res.send(err)
         }
@@ -790,7 +898,7 @@ function logging(req, callback) {
 
         } else {
 
-            jwt.verify(req.cookies.jwt, config.secret, function (err, decoded) {
+            jwt.verify(req.cookies.jwt, config.secret, function(err, decoded) {
                 if (err) {
                     console.log('Token non valido');
                     out.logged = false;
@@ -808,4 +916,15 @@ function logging(req, callback) {
 
     });
 };
+
+/* function isNumeric(req, callback) {
+    console.log('------------------------------------');
+    console.log('quantità  ' + req.body.quantity);
+    console.log('------------------------------------');
+    var out = /^-?[\d.]+(?:e-?\d+)?$/.test(req.body.quantity);
+    console.log('------------------------------------');
+    console.log('numero ??  ' + out);
+    console.log('------------------------------------');
+    callback(out);
+}*/
 module.exports = router;
