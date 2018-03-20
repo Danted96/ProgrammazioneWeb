@@ -260,6 +260,7 @@ router.get('/carrello', function (req, res, next) {
                 var codice_utente = utente[0]._id;
                 Carrelli.find({ codice_utente: codice_utente }).then(function (carrello_utente) {
                     carrello = JSON.parse(carrello_utente[0].carrello);
+                    console.log('carrello ---------- ' + JSON.parse(carrello_utente[0].carrello));
                     res.render('index', { title: 'carrello', contenuto: 'carrello', auth: dati.logged, carrello: carrello });
                 });
             });
@@ -279,14 +280,14 @@ router.get('/carrello/aggiungi', function (req, res, next) {
         if (dati.logged == true) {
             Carrelli.find({ codice_utente: dati.userID }).then(function (carrello_utente) {
                 carrello = JSON.parse(carrello_utente[0].carrello);
-                console.log('carrello : ' + carrello);
+
                 if (aggiungi == undefined) {
                     res.render('index', { title: 'carrello', contenuto: 'carrello', auth: dati.logged, carrello: carrello });
                 } else {
                     Prodotti.find({ _id: ObjectID(aggiungi) }).then(function (oggetto) {
                         oggetto[0].quantita = 1;
                         carrello.push(JSON.stringify(oggetto[0]));
-
+                        console.log('carrello +++++++++++ : ' + (oggetto[0]));
                         Carrelli.update({ codice_utente: dati.userID }, { carrello: JSON.stringify(carrello) }, function (result) {
                             res.redirect('/');
                         });
@@ -348,7 +349,6 @@ router.post('/carrello/update', function (req, res, next) {
 
 
 router.get('/carrello/acquista', function (req, res, next) {
-
     logging(req, function (dati) {
         if (dati.logged == false) {
             res.redirect('/');
@@ -441,9 +441,9 @@ router.get('/carrello/acquista', function (req, res, next) {
             });
         }
     });
+    
 
 });
-
 
 /* PASSWORD */
 router.get('/passwordDimenticata', function (req, res, next) {
@@ -617,8 +617,8 @@ router.post('/amministrazione/aggiungi', function (req, res, next) {
                 avverti_user: []
 
             })
-            console.log('nuovo prodotto '+ nuovoProdotto);
-            Prodotti.create(nuovoProdotto).then( function (data) {
+            console.log('nuovo prodotto ' + nuovoProdotto);
+            Prodotti.create(nuovoProdotto).then(function (data) {
                 res.redirect('/amministrazione');
             });
 
