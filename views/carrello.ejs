@@ -36,7 +36,7 @@
                     </h4>
                 </td>
                 <td class="col-sm-1">
-                    <input class="item-amount" name="quantità" type="text" id="quantita<%- i %>" value="<%- JSON.parse(carrello[i]).quantita %>">
+                    <input class="item-amount" name="quantità" type="number" min="1" id="quantita<%- i %>" value="<%- JSON.parse(carrello[i]).quantita %>">
                 </td>
                 <td class="col-sm-2">
                     <button class="btn btn-warning" name="Aggiorna" type="submit" onclick="carrelloUpdate(<%- i %>,$('#quantita<%- i %>').val());">Aggiorna</button>

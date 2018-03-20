@@ -638,21 +638,18 @@ router.get('/amministrazione/cerca', function(req, res, next) {
 
 router.get('/amministrazione/prodotto', function(req, res, next) {
 
-    var codice_prodotto = req.query.pro;
-    console.log('codice del prodotto' + req.query.pro);
-    var _id = (codice_prodotto);
-    console.log('id  ' + _id);
+    
     logging(req, function(dati) {
         if (dati.logged == true) {
-            Prodotti.find({ _id: ObjectID(codice_prodotto) }).then(function(dati_prodotto) {
+           
                 res.render('backend/index', {
                     title: 'prodotto',
                     contenuto: 'aggiungiprodotto',
-                    dati_prodotto: dati_prodotto[0],
+                    dati_prodotto:null,
                     auth: dati.logged,
                     errore: null
                 });
-            });
+            
         } else {
             res.redirect('/amministrazione');
         }

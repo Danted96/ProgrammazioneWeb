@@ -39,11 +39,11 @@
 
                     <div class="form-group">
                         <label class="col-form-label" for="quantità" required>Quantità:</label>
-                        <input class="singin-input" name="quantita" type="text" id="quantita" value="<%- prodotti[i].quantita %>">
+                        <input class="singin-input" name="quantita" type="number" min="1" id="quantita" value="<%- prodotti[i].quantita %>">
                     </div>
                     <div class="form-group">
                         <label class="col-form-label" for="indirizzo" required>Prezzo:</label>
-                        <input class="singin-input" name="prezzo" type="text" id="indirizzo" value="<%- prodotti[i].prezzo %>">
+                        <input class="singin-input" name="prezzo" type="number" min="1"id="prezzo" value="<%- prodotti[i].prezzo %>">
                     </div>
                     <div class="form-group">
                         <label for="inputCategoria">Categoria</label>
@@ -57,7 +57,7 @@
                     </div>
                     <div class="form-group">
                         <label class="col-form-label" for="cognome" required>Descrizione:</label>
-                        <textarea class="form-control" id="descrizioneTextarea" name="descrizione" rows="3"><%- prodotti[i].descrizione %></textarea>
+                        <textarea class="form-control" id="descrizioneTextarea" name="descrizione" type="text" rows="3"><%- prodotti[i].descrizione %></textarea>
                     </div>
 
                     <div class="form-group">
@@ -71,3 +71,45 @@
 
         </div>
         <% } %>
+        <script>
+        var testo = document.querySelectorAll('input[type=text]');
+var number = document.querySelectorAll('input[type=number]');
+var form = document.getElementById("form-modifica");
+var error = document.querySelector('.error');
+
+testo.addEventListener("input", function (event) {
+        // Each time the user types something, we check if the
+        // email field is valid.
+        if (testo.validity.valid) {
+                // In case there is an error message visible, if the field
+                // is valid, we remove the error message.
+                error.innerHTML = ""; // Reset the content of the message
+                error.className = "error"; // Reset the visual state of the message
+        }
+}, false);
+
+number.addEventListener("input", function (event) {
+        // Each time the user types something, we check if the
+        // email field is valid.
+        if (number.validity.valid) {
+                // In case there is an error message visible, if the field
+                // is valid, we remove the error message.
+                error.innerHTML = ""; // Reset the content of the message
+                error.className = "error"; // Reset the visual state of the message
+        }
+}, false);
+
+form.addEventListener("submit", function (event) {
+        // Each time the user tries to send the data, we check
+        // if the email field is valid.
+        if (!testo.validity.valid || !email.validity.valid) {
+
+                // If the field is not valid, we display a custom
+                // error message.
+                error.innerHTML = "dati non corretti!";
+                error.className = "error active";
+                // And we prevent the form from being sent by canceling the event
+                event.preventDefault();
+        }
+}, false);
+        </script>

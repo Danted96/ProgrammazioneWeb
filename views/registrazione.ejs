@@ -1,3 +1,7 @@
+
+<script src="../js/validazione.js">
+ 
+</script>
 <% if(errore != null) {%>
         <%-'<h3 style="color:#ffaaaa;">'+ errore + '</h3>' %>
                 <% } %>
@@ -8,22 +12,26 @@
                                         <br>
                                 </h3>
                         </div>
-                        <form method="POST" action="/registrazione" name="registrazione">
+                        <form method="POST" action="/registrazione" name="registrazione" id="form-registrazione">
                                 <div class="form-group">
                                         <label class="col-form-label" for="formGroupNome" required>Nome</label>
-                                        <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome">
+                                        <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" required>
+                                        <span class="error" aria-live="polite"></span>
                                 </div>
                                 <div class="form-group">
                                         <label class="col-form-label" for="formGroupCognome" required>Cognome</label>
-                                        <input type="text" class="form-control" id="cognome" name="cognome" placeholder="Cognome">
+                                        <input type="text" class="form-control" id="cognome" name="cognome" placeholder="Cognome" required>
+                                        <span class="error" aria-live="polite"></span>
                                 </div>
                                 <div class="form-group">
                                         <label class="col-form-label" for="formGroupEmail" required>Email</label>
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+                                        <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                                        <span class="error" aria-live="polite"></span>
                                 </div>
                                 <div class="form-group">
                                         <label class="col-form-label" for="formGroupIndirizzo" required>Indirizzo</label>
-                                        <input type="text" class="form-control" id="indirizzo" name="indirizzo" placeholder="Indirizzo">
+                                        <input type="text" class="form-control" id="indirizzo" name="indirizzo" placeholder="Indirizzo" required>
+                                        <span class="error" aria-live="polite"></span>
                                 </div>
                                 <div class="form-group">
                                         <label for="inputState">Stato</label>
@@ -34,18 +42,24 @@
                                                 <option>Germania</option>
                                                 <option>Olanda</option>
                                         </select>
+                                        <span class="error" aria-live="polite"></span>
                                 </div>
                                 <div class="form-group">
                                         <label class="col-form-label" for="formGroupProvincia" required>Provincia</label>
-                                        <input type="text" class="form-control" id="provincia" name="provincia" placeholder="Provincia">
+                                        <input type="text" class="form-control" id="provincia" name="provincia" placeholder="Provincia" required>
+                                        <span class="error" aria-live="polite"></span>
                                 </div>
                                 <div class="form-group">
                                         <label class="col-form-label" for="formGroupTelefono" required>Telefono</label>
-                                        <input type="tel" class="form-control" id="telefono" name="telefono" placeholder="Telefono">
+                                        <input type="tel" class="form-control" id="telefono" name="telefono" placeholder="Telefono" required>
+                                        <span class="error" aria-live="polite"></span>
                                 </div>
                                 <div class="form-group">
                                         <label class="col-form-label" for="formGroupPassword" required>Password</label>
-                                        <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                                        <span class="error" aria-live="polite"></span>
                                 </div>
                                 <button class="btn btn-primary btn-lg" type="submit">Invia</button>
                         </form>
+
+                       

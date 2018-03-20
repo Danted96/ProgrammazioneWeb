@@ -52,6 +52,7 @@
                   <div class="form-group">
                     <label>Email</label>
                     <input type="email" class="form-control" id="accesso-email" name="login_email" placeholder="email" required>
+                    <span class="error" aria-live="polite"></span>
                   </div>
 
                   <div class="form-group">
@@ -179,42 +180,31 @@
 </body>
 
 <script>
-	validate.init({
+  var email =document.getElementById("accesso-email");
+  var form  = document.getElementById("form-login");
+var error = document.querySelector('.error');
+  email.addEventListener("input", function (event) {
+  // Each time the user types something, we check if the
+  // email field is valid.
+  if (email.validity.valid) {
+    // In case there is an error message visible, if the field
+    // is valid, we remove the error message.
+    error.innerHTML = ""; // Reset the content of the message
+    error.className = "error"; // Reset the visual state of the message
+  }
+}, false);
 
-// Classes and Selectors
-selector: '[data-validate]', // The selector for forms to validate
-fieldClass: 'error', // The class to apply to fields with errors
-errorClass: 'error-message', // The class to apply to error messages
-
-// Messages
-messageValueMissing: 'Please fill out this field.', // Displayed when a required field is left empty
-messageTypeMismatchEmail: 'Please enter an email address.', // Displayed when a `type="email"` field isn't a valid email
-messageTypeMismatchURL: 'Please enter a URL.', // Displayed when a `type="url"` field isn't a valid URL
-messageTooShort: 'Please lengthen this text to {minLength} characters or more. You are currently using {length} characters.', // Displayed with the `minLength` attribute is used and the input value is too short
-messageTooLong: 'Please shorten this text to no more than {maxLength} characters. You are currently using {length} characters.', // Displayed with the `maxLength` attribute is used and the input value is too long
-messagePatternMismatch: 'Please match the requested format.', // Displayed with the `pattern` attribute is used and the pattern doesn't match (if a `title` attribute is used, that's displayed instead)
-messageBadInput: 'Please enter a number.', // Displayed when the field is numeric (ex. `type="number"`) but the value is not a number
-messageStepMismatch: 'Please select a valid value.', // Displayed when the `step` attribute is used and the value doesn't adhere to it
-messageRangeOverflow: 'Please select a value that is no more than {max}.', // Displayed with the `max` attribute is used and the input value is too hight
-messageRangeUnderflow: 'Please select a value that is no less than {min}.', // Displayed with the `mind` attribute is used and the input value is too low
-messageGeneric: 'The value you entered for this field is invalid.', // A catchall error, displayed when the field fails validation and none of the other conditions apply
-
-// Form Submission
-disableSubmit: false, // If true, don't submit the form to the server (for Ajax for submission)
-onSubmit: function (form, fields) {}, // Function to run if the form successfully validates
-
-// Callbacks
-beforeShowError: function (field, error) {}, // Function to run before an error is display
-afterShowError: function (field, error) {}, // Function to run after an error is display
-beforeRemoveError: function (field) {}, // Function to run before an error is removed
-afterRemoveError: function (field) {}, // Function to run after an error is removed
-
-});
-
-
-var error = validate.hasError(document.querySelector('#accesso-email'));
-console.log('errore     ++++      ' +error);
-if (error) {
-validate.showError(login_email,error);
-}
+form.addEventListener("submit", function (event) {
+  // Each time the user tries to send the data, we check
+  // if the email field is valid.
+  if (!email.validity.valid) {
+    
+    // If the field is not valid, we display a custom
+    // error message.
+    error.innerHTML = "dati non corretti, dude!";
+    error.className = "error active";
+    // And we prevent the form from being sent by canceling the event
+    event.preventDefault();
+  }
+}, false);
 </script>
