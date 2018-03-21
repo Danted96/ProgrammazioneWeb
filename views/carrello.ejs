@@ -1,5 +1,5 @@
-
-<h1>Carrello</h1>
+<h1>
+    Carrello</h1>
 
 <table class="table">
     <thead>
@@ -37,10 +37,13 @@
                 </td>
                 <td class="col-sm-1">
                     <input class="item-amount" name="quantità" type="number" min="1" id="quantita<%- i %>" value="<%- JSON.parse(carrello[i]).quantita %>">
+                    <span class="error" aria-live="polite"></span>
                 </td>
                 <td class="col-sm-2">
-                    <button class="btn btn-warning" name="Aggiorna" type="submit" onclick="carrelloUpdate(<%- i %>,$('#quantita<%- i %>').val());">Aggiorna</button>
+                    <button class="btn btn-warning" id="aggiorna" name="Aggiorna" type="submit" onclick="carrelloUpdate(<%- i %>,$('#quantita<%- i %>').val());">Aggiorna</button>
+                    <span class="error" aria-live="polite"></span>
                     <button class="btn btn-danger" name="rimuovi" type="submit" onclick="carrelloRemove(<%- i %>);">Rimuovi</button>
+                    <span class="error" aria-live="polite"></span>
                 </td>
                 <td class="col-sm-1" id="subTotale<%- i %>" style="font-size:18px;">
 
@@ -62,26 +65,29 @@
                             <td></td>
                             <td></td>
                             <td></td>
-                            <td>
+                            <td id="compra-prodotti">
                                 <button id="compra" class="btn btn-primary" name="Compra" type="submit" onclick=" window.location = window.location.origin + '/carrello/acquista';">Acquista</button>
-
+                                <span class="error" aria-live="polite"></span>
                             </td>
 
                             <td>
-                                <strong>Totale:</strong><h4>
+                                <strong>Totale:</strong>
+                                <h4>
                                     <%- totale %> €
                                 </h4>
-                                
-                                    <% } else {%>
-                                        Ritorna dopo aver aggiunto qualche prodotto.
 
-                                        <% }%>
+                                <% } else {%>
+                                    Ritorna dopo aver aggiunto qualche prodotto.
+
+                                    <% }%>
                             </td>
                         </tr>
     </tbody>
 </table>
 
 <script>
+    
+
     window.onload = function () {
         for (var j = 0; j < <%- carrello.length %>; j++) {
             console.log('indice : ' + j);

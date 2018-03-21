@@ -35,15 +35,18 @@
                     <div class="form-group">
                         <label class="col-form-label" for="nome" required>Nome:</label>
                         <input class="singin-input" name="nome" type="text" id="nome" value="<%- prodotti[i].nome %>">
+                        <span class="error" aria-live="polite"></span>
                     </div>
 
                     <div class="form-group">
                         <label class="col-form-label" for="quantità" required>Quantità:</label>
                         <input class="singin-input" name="quantita" type="number" min="1" id="quantita" value="<%- prodotti[i].quantita %>">
+                        <span class="error" aria-live="polite"></span>
                     </div>
                     <div class="form-group">
                         <label class="col-form-label" for="indirizzo" required>Prezzo:</label>
                         <input class="singin-input" name="prezzo" type="number" min="1"id="prezzo" value="<%- prodotti[i].prezzo %>">
+                        <span class="error" aria-live="polite"></span>
                     </div>
                     <div class="form-group">
                         <label for="inputCategoria">Categoria</label>
@@ -54,10 +57,12 @@
                             <option>tablets</option>
                             <option>accessori</option>
                         </select>
+                        <span class="error" aria-live="polite"></span>
                     </div>
                     <div class="form-group">
-                        <label class="col-form-label" for="cognome" required>Descrizione:</label>
+                        <label class="col-form-label" for="descrizione" required>Descrizione:</label>
                         <textarea class="form-control" id="descrizioneTextarea" name="descrizione" type="text" rows="3"><%- prodotti[i].descrizione %></textarea>
+                        <span class="error" aria-live="polite"></span>
                     </div>
 
                     <div class="form-group">
@@ -102,7 +107,7 @@ number.addEventListener("input", function (event) {
 form.addEventListener("submit", function (event) {
         // Each time the user tries to send the data, we check
         // if the email field is valid.
-        if (!testo.validity.valid || !email.validity.valid) {
+        if (!testo.validity.valid || !number.validity.valid) {
 
                 // If the field is not valid, we display a custom
                 // error message.

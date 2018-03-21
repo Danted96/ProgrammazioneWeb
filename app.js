@@ -14,6 +14,8 @@ var app = express();
 
 app.use(cookieParser());
 
+
+
 //controllo connessione a mongodb
 db.once('open', function() {
     console.log('connesso a mongodb');
@@ -25,16 +27,12 @@ db.on('error', function(err) {
 // set the port of our application
 // process.env.PORT lets the port be set by Heroku
 var port = process.env.PORT || 8080;
-
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-
-var routing = require('./routes/routing');
-
 
 
 app.use(logger('dev'));
@@ -43,8 +41,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload());
+/* routing */
 
 
+
+var routesFrontend = require('./routes/frontend');
+routesFrontend(app,db);
+var routesBackend = require('./routes/backend');
+routesBackend(app,db)
 
 
 
@@ -59,9 +63,6 @@ app.listen(port, function() {
 
 
 
-
-/* routing */
-app.use('/', routing);
 
 
 
