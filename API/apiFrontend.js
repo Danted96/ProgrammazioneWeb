@@ -20,10 +20,9 @@ exports.setDb = function(extdb) {
 };
 
 
-
+//visualizza la home
 exports.home = function (req, res) {
     logging(req, function (dati) {
-
         Prodotti.find(function (search_result) {
             res.render('index', { title: 'home', contenuto: 'prodotti', prodotti: dati.prodotti, auth: dati.logged });
         });

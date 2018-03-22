@@ -11,8 +11,7 @@ var cookieParser = require('cookie-parser');
 var mongoose = require('mongoose');
 var Prodotti = require('../models/prodotti');
 var Utenti = require('../models/utenti');
-var Ordini = require('../models/ordini');
-var Carrelli = require('../models/carrelli');
+
 
 var db;
 exports.setDb = function (extdb) {
@@ -115,10 +114,6 @@ exports.aggiungi_prodotto = function (req, res) {
         if (prodotto.nome != undefined || prodotto.quantita != undefined || prodotto.prezzo != undefined || prodotto.descrizione != undefined || prodotto.categoria != undefined) {
             res.render('backend/aggiungiprodotto', { errore: 'dati non corretti o incompleti', auth: dati.logged });
         }
-        /*if (!(isNumber(prodotto.quantita)) || !(isNumber(prodotto.prezzo))) {
-            res.render('backend/aggiungiprodotto', { errore: 'la quantità e il prezzo devo essere valori numerici', auth: dati.logged });
-
-        }*/
         if (dati.logged == true) {
 
             if (Number(prodotto.quantita) <= 5) {

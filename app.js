@@ -41,10 +41,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload());
+
+
+
 /* routing */
-
-
-
 var routesFrontend = require('./routes/frontend');
 routesFrontend(app,db);
 var routesBackend = require('./routes/backend');
@@ -57,12 +57,6 @@ routesBackend(app,db)
 app.listen(port, function() {
     console.log('Our app is running on http://localhost:' + port);
 });
-
-
-
-
-
-
 
 
 
