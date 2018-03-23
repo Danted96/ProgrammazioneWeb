@@ -37,6 +37,16 @@ password: admin
 + ProgrammazioneWeb
 	+ .vscode
 		launch.json
+	+ API
+		apiBackend.js
+		apiFrontend.js
+	+ models
+		carrelli.js
+		ordini.js
+		prodoti.js
+		sessioni.js
+		sessioni_backend.js
+		utenti.js
 	+ node_modules
 	+ public
   		+ css
@@ -50,7 +60,8 @@ password: admin
 			bootstrap.js
 			bootstrap.min.js
 	+ routes
-  		routing.js
+  		backend.js
+		frontend.js
 	+ views
 		+ backend
 			aggiungiprodotto.ejs
@@ -66,16 +77,12 @@ password: admin
 		profilo.ejs
 		registrazione.ejs
 		storicoordini.ejs
-    + zzCustom
-		mongoGlobal.js
-		package.json
-		socketGlobal.js
  app.js
  package.json
  package-lock.json
  Procfile
  README.md
-
+ config.js
 ```
 
 ## Autori 
